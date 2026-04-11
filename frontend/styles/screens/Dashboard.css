@@ -1,0 +1,113 @@
+.dashboard {
+    width: 100%;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2vh 1vw;
+    margin: 4vh 1vw;
+}
+
+.dashboard h1 {
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--text);
+    margin-top: 4vh;
+    margin-left: 1vw;
+    text-align: left;
+    line-height: 1;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4vh;
+    margin-left: 1vw;
+    margin-right: 1vw;
+}
+
+.labels-repo {
+    display: flex;
+    margin-left: 1vw;
+    gap: 0.7vw;
+    margin-top: 2vh;
+}
+
+.labels-repo p {
+    background-color: var(--label-bg);
+    color: var(--text);
+    font-size: 15px;
+    padding: 0.2vh 0.7vw;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+}
+
+.left-header h1 {
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--text);
+    margin: 1vh 1vw;
+    line-height: 1;
+}
+
+.right-header {
+    display: flex;
+    gap: 1vw;
+    margin-right: 1vw;
+}
+
+.button {
+    background-color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    color: white;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.settings-button {
+    background-color: var(--text);
+    border: 1px solid var(--text);
+    border-radius: 8px;
+    color: white;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.text-ai {
+    margin: 2vh 1vw;
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+}
+
+.text-ai p {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 1vh;
+}
+
+.text-ai a {
+    color: var(--accent);
+    font-size: 22px;
+    text-decoration: none;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.text-ai a svg {
+    transform: translateY(2px);
+}

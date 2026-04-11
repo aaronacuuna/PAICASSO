@@ -1,0 +1,28 @@
+.repository-card {
+    border: 1px solid #A0A9AB;
+    border-radius: 8px;
+    margin-bottom: 1.5vh;
+    margin-top: 1.5vh;
+    margin-right: 1vw;
+    text-align: left;
+    cursor: pointer;
+    background-color: var(--accent-bg);
+}
+
+.repository-card h3 {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    margin-left: 1.8vw;
+    margin-top: 1.5vh;
+    margin-bottom: 1.5vh;
+}
+
+.selected {
+    border-color: var(--accent);
+    border-left-width: 6px;
+}
+
+.selected h3 {
+    font-weight: bold;
+}

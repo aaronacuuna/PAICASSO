@@ -1,0 +1,24 @@
+.metric-container {
+    border: 1px solid var(--border);
+    margin: 1vh 1vw;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 22vh;
+}
+
+.metric-container h2 {
+    font-weight: 500;
+    color: var(--text);
+    margin: 0;
+    margin-bottom: 2vh;
+}
+
+.metric-container p {
+    color: #55767C;
+    font-size: 32px;
+    font-weight: bold;
+    margin: 0;
+    margin-bottom: 3vh;
+}

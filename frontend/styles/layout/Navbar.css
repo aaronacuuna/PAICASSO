@@ -1,0 +1,51 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+}
+
+.navbar-left .logo-link {
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+    text-decoration: none;
+    color: var(--text);
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+}
+
+.logo-img {
+    width: 32px;
+    height: 32px;
+    margin-left: 2vw;
+}
+
+.logo-text {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+}
+
+.greeting {
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    margin-right: 2vw;
+}
