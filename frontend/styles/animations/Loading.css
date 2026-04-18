@@ -1,4 +1,4 @@
-.loading-metrics {
+.loading {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -38,8 +38,8 @@
     }
 }
 
-.loading-metrics h3 {
-    font-size: 18px;
+.loading .loading-text {
+    font-size: 15px;
     color: var(--text);
     margin: 0;
     text-align: center;

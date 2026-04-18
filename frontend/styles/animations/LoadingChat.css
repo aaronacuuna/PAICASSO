@@ -1,0 +1,34 @@
+.loading-chat-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.loading-chat-dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 100%;
+    margin: 1.1vh 0.2vw 0.4vh 0.2vw;
+}
+
+.loading-chat-dots .dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--accent);
+    border-radius: 50%;
+    animation: chat-bounce 0.6s infinite alternate;
+}
+
+.loading-chat-dots .dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-chat-dots .dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes chat-bounce {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-4px); }
+}

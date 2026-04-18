@@ -1,0 +1,176 @@
+.repo-name {
+    color: var(--accent);
+}
+
+.analysis {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.side-panel {
+    background-color: var(--accent-bg);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.issues-panel {
+    border-right: 1px solid var(--border);
+}
+
+.chat-panel {
+    border-left: 1px solid var(--border);
+}
+
+.side-panel.open {
+    width: 20vw;
+}
+
+.side-panel.closed {
+    width: 60px;
+    align-items: center;
+    border: none;
+    background-color: transparent;
+}
+
+.toggle-btn {
+    margin-top: 2vh;
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    font-size: 20px;
+    padding: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+
+.issues-panel.open .toggle-btn {
+    justify-content: flex-end;
+}
+
+.chat-panel.open .toggle-btn {
+    justify-content: flex-start;
+}
+
+.panel-content {
+    padding: 0 1.8vw;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-content h3 {
+    margin-top: 0;
+    color: var(--text);
+    font-size: 20px;
+}
+
+.analysis-container {
+    flex: 1;
+    padding: 3vh 3vw;
+    margin-left: -1.2vw;
+    text-align: left;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.analysis-container h1 {
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 0;
+}
+
+.issues-list {
+    flex: 1;
+    margin-bottom: 1vh;
+}
+
+.code-block {
+    margin: 0;
+    margin: 1vh 0vw;
+    padding: 1vh 1vw;
+    border: 1px solid var(--border);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-x: auto;
+    scrollbar-width: none;
+    width: 100%;
+    border-radius: 8px;
+}
+
+.code-line {
+    display: flex;
+}
+
+.line-number {
+    opacity: 0.5;
+    user-select: none;
+    width: 2rem;
+    text-align: left;
+    margin-right: 1rem;
+}
+
+.issue-inline-container {
+    width: 100%;
+    background: #ffd0c0;
+    padding: 10px;
+    border: 1px solid var(--accent);
+    border-left: 5px solid var(--accent);
+    margin-bottom: 5px;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.2;
+    text-align: left;
+}
+
+.issue-inline-container div {
+    width: 98%;
+}
+
+.inline-explain-button {
+    background: var(--text);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    padding: 1.5vh 1.5vw;
+    cursor: pointer;
+    font-weight: 700;
+    margin-left: 1vw;
+    margin-right: 1vw;
+    margin-top: 1vh;
+    display: flex;
+    justify-self: flex-end;
+}
+
+.file-name {
+    background: #ffd0c0;
+    padding: 4px 10px;
+    border: 1px solid var(--accent);
+    margin-bottom: 5px;
+    width: fit-content;
+    border-radius: 6px;
+    font-weight: 700;
+    margin-left: 1vw;
+    font-size: 14px;
+}
+
+.chat-wrapper {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+.chat-wrapper.hidden {
+    display: none;
+}

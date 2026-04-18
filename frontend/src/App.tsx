@@ -3,6 +3,7 @@ import Login from "../components/screens/Login";
 import Home from "../components/screens/Home";
 import Configuration from "../components/screens/Configuration";
 import Navbar from "../components/layout/Navbar";
+import Analysis from "../components/screens/Analysis";
 
 function App() {
   const isAuthenticated = true;
@@ -18,7 +19,13 @@ function App() {
         />
         <Route
           path="/settings/:repoName"
-          element={isAuthenticated ? <Configuration /> : <Navigate to="/login" />}
+          element={
+            isAuthenticated ? <Configuration /> : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/analysis/:repoName"
+          element={isAuthenticated ? <Analysis /> : <Navigate to="/login" />}
         />
         <Route
           path="/*"

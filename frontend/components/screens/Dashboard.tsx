@@ -4,7 +4,7 @@ import MetricCard from "../cards/MetricCard";
 import "../../styles/screens/Dashboard.css";
 import { FaCog, FaLongArrowAltRight } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import LoadingMetrics from "../animations/LoadingMetrics";
+import Loading from "../animations/Loading";
 
 const mockMetrics: Metric[] = [
   { name: "Bugs", value: 13, label: "C", percentage: false, repositoryId: 1 },
@@ -43,7 +43,9 @@ export default function Dashboard({ repo }: { repo: Repository }) {
         </div>
         <div className="right-header">
           <button
-            onClick={() => navigate(`/settings/${encodeURIComponent(repo.name)}`)}
+            onClick={() =>
+              navigate(`/settings/${encodeURIComponent(repo.name)}`)
+            }
             className="settings-button"
           >
             <FaCog />
@@ -62,17 +64,26 @@ export default function Dashboard({ repo }: { repo: Repository }) {
             <MetricCard key={metric.name} metric={metric} />
           ))}
           <div className="text-ai">
-            <p>
-              Explora estos problemas en detalle y resuélvelos con ayuda de tu
-              asistente
-            </p>
-            <Link to="/analysis">
-              Acceder al Análisis Inteligente <FaLongArrowAltRight />
-            </Link>
+            {repo.lastAnalysisDate ? (
+              <>
+                <p>
+                  Explora estos problemas en detalle y resuélvelos con ayuda de
+                  tu asistente
+                </p>
+                <Link to={`/analysis/${encodeURIComponent(repo.name)}`}>
+                  Acceder al Análisis Inteligente <FaLongArrowAltRight />
+                </Link>
+              </>
+            ) : (
+              <p style={{ color: "var(--border)" }}>
+                Debes ejecutar un análisis estático primero para acceder al
+                asistente inteligente
+              </p>
+            )}
           </div>
         </div>
       ) : (
-        <LoadingMetrics />
+        <Loading text="Cargando métricas ..."/>
       )}
     </div>
   );

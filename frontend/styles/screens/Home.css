@@ -8,6 +8,7 @@
     width: 20%;
     flex: 0 0 auto;
     border-right: 1px solid var(--border);
+    background-color: var(--accent-bg);
 }
 
 .left-panel h2 {
@@ -101,7 +102,7 @@
     border: 1px solid var(--border);
     border-radius: 16px;
     justify-content: space-around;
-    align-items: center; 
+    align-items: center;
     margin: 2vh 6vw;
 }
 
