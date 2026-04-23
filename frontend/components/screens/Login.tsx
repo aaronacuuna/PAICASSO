@@ -32,12 +32,12 @@ function Login() {
 
         {/* Right side */}
         <div className="inner-container">
-          <img src="/favicon.svg" alt="Logo" className="logo" />
+          <img src="/paicasso.png" alt="Logo" className="logo" />
           <h1>PAICASSO</h1>
           <h2>Tu asistente para un código de calidad</h2>
           <GitHubButton
             text="Iniciar sesión con GitHub"
-            onClick={() => alert("Login con GitHub")}
+            onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/github"}
           />
         </div>
       </div>

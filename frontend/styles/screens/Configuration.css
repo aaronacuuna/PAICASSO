@@ -1,21 +1,9 @@
 .configuration-container {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     width: 100%;
     padding: 3vh 2vw;
     box-sizing: border-box;
-}
-
-.configuration-container a {
-    display: flex;
-    align-items: center;
-    color: var(--accent);
-    font-size: 20px;
-    text-decoration: none;
-    font-weight: bold;
-    gap: 8px;
-    justify-self: flex-start;
 }
 
 .configuration-container h2 {

@@ -4,52 +4,105 @@ import "../../styles/screens/Home.css";
 import RepositoryCard from "../cards/RepositoryCard";
 import GitHubButton from "../buttons/GitHubButton";
 import Dashboard from "./Dashboard";
-import type Repository from "../../types/Repository";
+import { type Repository, type ApiRepository } from "../../types/Repository";
+import { useEffect, useState } from "react";
+import Loading from "../animations/Loading";
+import { apiFetch } from "../../utils/apiFetch";
+import GithubReposModal from "../layout/GithubReposModal";
 
 function Home() {
-  const repositories: Repository[] = [
-    { id: 1, name: "proyecto-A", language: "Java 17", lastAnalysisDate: "2024-06-01" },
-    { id: 2, name: "proyecto-B", language: "Python", lastAnalysisDate: null },
-    { id: 3, name: "proyecto-C", language: "JavaScript", lastAnalysisDate: null },
-    { id: 4, name: "proyecto-D", language: "TypeScript", lastAnalysisDate: null },
-    { id: 5, name: "proyecto-E", language: "C++", lastAnalysisDate: null },
-  ];
-
+  const [repositories, setRepositories] = useState<Repository[] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const pathParts = location.pathname.split("/");
   const isDashboard = pathParts[1] === "dashboard";
-  const repoName = isDashboard && pathParts[2] ? decodeURIComponent(pathParts[2]) : null;
-  const selectedRepo = repositories.find((r) => r.name === repoName) || null;
+  const repoId =
+    isDashboard && pathParts[2] ? parseInt(pathParts[2], 10) : null;
+  const selectedRepo =
+    repositories?.find((r: Repository) => r.id === repoId) || null;
 
   const handleSelectRepo = (repo: Repository) => {
-    navigate(`/dashboard/${encodeURIComponent(repo.name)}`);
+    navigate(`/dashboard/${repo.id}`);
   };
+
+  const fetchRepositories = async () => {
+    try {
+      setRepositories(null);
+      const data = await apiFetch("/api/repositorios");
+      const mappedRepos: Repository[] = data.map((repo: ApiRepository) => ({
+        id: repo.id,
+        name: repo.nombre,
+        language: repo.lenguajePrincipal,
+        url: repo.url,
+        vinculado: repo.vinculado,
+        lastAnalysisDate: null,
+      }));
+      setRepositories(mappedRepos);
+    } catch (error) {
+      console.error("Error al cargar repositorios:", error);
+      setRepositories([]);
+    }
+  };
+
+  useEffect(() => {
+    const loadRepositories = async () => {
+      try {
+        setRepositories(null);
+        const data = await apiFetch("/api/repositorios");
+        const mappedRepos: Repository[] = data.map((repo: ApiRepository) => ({
+          id: repo.id,
+          name: repo.nombre,
+          language: repo.lenguajePrincipal,
+          url: repo.url,
+          vinculado: repo.vinculado,
+          lastAnalysisDate: null,
+        }));
+        setRepositories(mappedRepos);
+      } catch (error) {
+        console.error("Error al cargar repositorios:", error);
+        setRepositories([]);
+      }
+    };
+    loadRepositories();
+  }, []);
 
   return (
     <div className="home">
+      <GithubReposModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onRepoLinked={fetchRepositories}
+      />
+
       {/* Left panel */}
-      {repositories.length > 0 ? (
-        <div className="left-panel">
-          <h2>Tus repositorios</h2>
-          <ul>
-            {repositories.map((repo) => (
-              <RepositoryCard
-                key={repo.id}
-                repo={repo}
-                onClick={() => handleSelectRepo(repo)}
-                selected={selectedRepo?.id === repo.id}
-              />
-            ))}
-          </ul>
-        </div>
+      {repositories ? (
+        repositories.length > 0 ? (
+          <div className="left-panel">
+            <h2>Tus repositorios</h2>
+            <ul>
+              {repositories.map((repo: Repository) => (
+                <RepositoryCard
+                  key={repo.id}
+                  repo={repo}
+                  onClick={() => handleSelectRepo(repo)}
+                  selected={selectedRepo?.id === repo.id}
+                />
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div className="left-panel empty">
+            <p>Aún no has vinculado ningún proyecto a tu cuenta</p>
+            <GitHubButton
+              text="Vincular repositorio"
+              onClick={() => setIsModalOpen(true)}
+            />
+          </div>
+        )
       ) : (
-        <div className="left-panel empty">
-          <p>Aún no has vinculado ningún proyecto a tu cuenta</p>
-          <GitHubButton
-            text="Vincular repositorio"
-            onClick={() => alert("Vincular repositorio")}
-          />
+        <div className="left-panel loading">
+          <Loading />
         </div>
       )}
 
@@ -70,7 +123,7 @@ function Home() {
             </p>
             <button
               className="connect-button"
-              onClick={() => alert("Vincular repositorio")}
+              onClick={() => setIsModalOpen(true)}
             >
               Añadir repositorio
             </button>

@@ -14,11 +14,30 @@ public class Analisis {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "estado", length = 50)
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", length = 20)
+    private EstadoAnalisis estado;
 
     @Column(name = "fecha_ejecucion")
     private LocalDateTime fechaEjecucion;
+
+    @Column(name = "total_bugs")
+    private Integer totalBugs;
+
+    @Column(name = "total_vulnerabilidades")
+    private Integer totalVulnerabilidades;
+
+    @Column(name = "total_code_smells")
+    private Integer totalCodeSmells;
+
+    @Column(name = "lineas_codigo")
+    private Integer lineasCodigo;
+
+    @Column(name = "cobertura")
+    private Double cobertura;
+
+    @Column(name = "duplicaciones")
+    private Double duplicaciones;
 
     @ManyToOne
     @JoinColumn(name = "repositorio_id")

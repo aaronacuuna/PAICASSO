@@ -1,4 +1,4 @@
-import type Metric from "../../types/Metric";
+import {type Metric} from "../../types/Metric";
 import "../../styles/cards/MetricCard.css";
 
 interface MetricCardProps {

@@ -1,30 +1,100 @@
 .issue-item {
-    width: 100%;
-    height: 70px;
     border: 1px solid var(--border);
     border-radius: 12px;
-    margin-bottom: 1.5vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 0 16px;
-    box-sizing: border-box;
+    margin-bottom: 12px;
+    text-align: left;
     cursor: pointer;
+    background-color: var(--bg);
+    transition: all 0.2s ease;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.issue-item h4 {
-    margin: 0;
-    font-size: 16px;
-}
-
-.issue-item p {
-    margin: 0;
-    color: var(--text);
-    font-size: 14px;
+.issue-item:hover {
+    border-color: var(--accent);
+    background-color: var(--accent-bg);
 }
 
 .issue-item.selected {
-    border: 3px solid var(--accent);
-    background-color: #fff3ef;
+    border: 2px solid var(--accent);
+    background-color: var(--accent-bg);
+    padding: 15px 19px;
+}
+
+.issue-item-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.issue-card-icon {
+    color: var(--border);
+    transition: color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.issue-item:hover .issue-card-icon,
+.issue-item.selected .issue-card-icon {
+    color: var(--accent);
+}
+
+.issue-item-content {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+}
+
+.issue-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.issue-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    width: 100%;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.issue-meta {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text);
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+}
+
+.issue-line {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent);
+    background-color: #ffd0c0;
+    /* Un fondo sutil para que resalte más como un "tag" */
+    padding: 0px 6px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.issue-item.selected .issue-line {
+    background-color: var(--bg);
+    border: 1px solid var(--accent);
+    /* Se ajusta si la tarjeta está seleccionada */
 }

@@ -1,0 +1,38 @@
+﻿.toast-container {
+    position: fixed;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--accent-bg);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    padding: 14px 24px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    z-index: 3000;
+    animation: slideDownFadeToast 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-icon {
+    color: var(--accent);
+}
+
+.toast-text {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+@keyframes slideDownFadeToast {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
+}

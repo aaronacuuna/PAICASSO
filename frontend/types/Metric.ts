@@ -1,4 +1,4 @@
-export default interface Metric {
+export interface Metric {
   name: "Bugs" | "Code Smells" | "Vulnerabilidades" | "Líneas" | "Cobertura" | "Duplicaciones";
   value: number;
   label?: "A" | "B" | "C" | "D" | "E" | "F";

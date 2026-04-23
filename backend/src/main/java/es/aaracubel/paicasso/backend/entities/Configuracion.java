@@ -18,10 +18,10 @@ public class Configuracion {
     @Column(name = "prioridades", length = 100)
     private String prioridades;
 
-    @Column(name = "comentarios", length = 100)
-    private String comentarios;
+    @Column(name = "comentarios")
+    private Boolean comentarios;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 }

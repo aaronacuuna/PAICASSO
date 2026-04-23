@@ -20,4 +20,7 @@ public class Usuario {
 
     @Column(name = "token_acceso", length = 512)
     private String tokenAcceso;
+
+    @Column(name = "foto_perfil", length = 512)
+    private String fotoPerfil;
 }

@@ -1,0 +1,238 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeInOverlay 0.2s ease-out;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 45vw;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--bg);
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.github-icon {
+  color: var(--text);
+}
+
+.header-title h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.close-button {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  margin-right: -8px;
+}
+
+.close-button:hover {
+  background-color: var(--accent-bg);
+  color: var(--accent);
+}
+
+.modal-body {
+  padding: 24px 32px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  scrollbar-color: var(--border) transparent;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.loading-center {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-repos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  text-align: center;
+  padding: 40px 0;
+  color: var(--text);
+  opacity: 0.6;
+}
+
+.empty-icon {
+  margin-bottom: 16px;
+  color: var(--border);
+}
+
+.github-repo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.github-repo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.github-repo-item:not(.vinculado):hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(226, 125, 96, 0.08);
+  /* Sombra con color accent */
+  transform: translateY(-2px);
+}
+
+.github-repo-item.vinculado {
+  background-color: #fafafa;
+  opacity: 0.9;
+}
+
+.repo-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.repo-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.repo-icon {
+  color: var(--border);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.github-repo-item:not(.vinculado):hover .repo-icon {
+  color: var(--accent);
+}
+
+.repo-name strong {
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.badge {
+  background-color: var(--accent-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--mono, monospace);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.link-button {
+  background-color: var(--accent);
+  border: 1px solid var(--accent);
+  color: white;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.2s ease;
+}
+
+.link-button:hover {
+  opacity: 0.85;
+}
+
+.vinculado-text {
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 14px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

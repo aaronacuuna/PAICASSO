@@ -1,14 +1,49 @@
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import "../../styles/screens/Configuration.css";
-import { FaLongArrowAltLeft } from "react-icons/fa";
+import { apiFetch } from "../../utils/apiFetch";
+import Loading from "../animations/Loading";
+import ToastMessage from "../animations/ToastMessage";
 
 export default function Configuration() {
-  const { repoName } = useParams();
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
   const [selectedPriorities, setSelectedPriorities] = useState<string[]>([]);
   const [addComments, setAddComments] = useState<boolean>(false);
-  const [translateSpanish, setTranslateSpanish] = useState<boolean>(false);
+
+  const [originalSelectedLevel, setOriginalSelectedLevel] = useState<
+    string | null
+  >(null);
+  const [originalSelectedPriorities, setOriginalSelectedPriorities] = useState<
+    string[]
+  >([]);
+  const [originalAddComments, setOriginalAddComments] =
+    useState<boolean>(false);
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [showToast, setShowToast] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        setLoading(true);
+        const data = await apiFetch("/api/configuracion");
+        if (data) {
+          setSelectedLevel(data.experienceLevel || null);
+          setSelectedPriorities(data.priorities || []);
+          setAddComments(data.addComments || false);
+          setOriginalSelectedLevel(data.experienceLevel || null);
+          setOriginalSelectedPriorities(data.priorities || []);
+          setOriginalAddComments(data.addComments || false);
+        }
+      } catch (error) {
+        console.error("Error al obtener la configuración:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchConfig();
+  }, []);
 
   const togglePriority = (priority: string) => {
     if (selectedPriorities.includes(priority)) {
@@ -18,23 +53,56 @@ export default function Configuration() {
     }
   };
 
-  const handleSaveSettings = () => {
-    const settings = {
-      experienceLevel: selectedLevel,
-      priorities: selectedPriorities,
-      addComments,
-      translateSpanish,
-    };
-    console.log("Configuración guardada:", settings);
-    alert(`Configuración guardada: ${JSON.stringify(settings)}`);
+  const handleSaveSettings = async () => {
+    const hasChanges =
+      selectedLevel !== originalSelectedLevel ||
+      addComments !== originalAddComments ||
+      selectedPriorities.length !== originalSelectedPriorities.length ||
+      selectedPriorities.some((p) => !originalSelectedPriorities.includes(p));
+
+    if (!hasChanges) {
+      setShowToast(false);
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const settings = {
+        experienceLevel: selectedLevel,
+        priorities: selectedPriorities,
+        addComments,
+      };
+
+      await apiFetch("/api/configuracion", {
+        method: "POST",
+        body: JSON.stringify(settings),
+      });
+
+      setOriginalSelectedLevel(selectedLevel);
+      setOriginalSelectedPriorities([...selectedPriorities]);
+      setOriginalAddComments(addComments);
+
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    } catch (error) {
+      console.error("Error al guardar la configuración:", error);
+      alert("Hubo un error al guardar tus preferencias.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <Loading />
+      </div>
+    );
+  }
+
   return (
-    <div>
+    <div className="configuration-view">
       <div className="configuration-container">
-        <Link to={`/dashboard/${repoName ? encodeURIComponent(repoName) : ""}`}>
-          <FaLongArrowAltLeft /> Volver al Dashboard
-        </Link>
         <h2>Configuración del Asistente Inteligente</h2>
       </div>
 
@@ -105,21 +173,21 @@ export default function Configuration() {
               Añadir comentarios explicativos en el código generado por la IA
             </span>
           </label>
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={translateSpanish}
-              onChange={(e) => setTranslateSpanish(e.target.checked)}
-            />
-            <span>Traducir la explicación a español</span>
-          </label>
         </div>
 
-        {/* Botón de guardar */}
-        <button className="save-button" onClick={() => handleSaveSettings()}>
+        <button
+          className="save-button"
+          onClick={handleSaveSettings}
+          disabled={isSaving}
+        >
           Guardar preferencias
         </button>
       </div>
+
+      <ToastMessage
+        message="Configuración guardada correctamente"
+        isVisible={showToast}
+      />
     </div>
   );
 }

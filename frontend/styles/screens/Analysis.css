@@ -1,5 +1,6 @@
 .repo-name {
     color: var(--accent);
+    margin-left: 0.7vw;
 }
 
 .analysis {
@@ -80,17 +81,23 @@
     text-align: left;
     overflow-y: auto;
     scrollbar-width: none;
+    min-width: 0;
+    /* Permite que el contenedor central encoja y no empuje al chat */
 }
 
 .analysis-container h1 {
     font-size: 32px;
     font-weight: bold;
     margin-top: 0;
+    display: flex;
+    flex-direction: row;
 }
 
 .issues-list {
     flex: 1;
-    margin-bottom: 1vh;
+    margin-bottom: 2vh;
+    overflow-y: auto;
+    scrollbar-width: none;
 }
 
 .code-block {
@@ -105,10 +112,24 @@
     scrollbar-width: none;
     width: 100%;
     border-radius: 8px;
+    container-type: inline-size;
 }
 
 .code-line {
     display: flex;
+    width: max-content;
+}
+
+.code-block-inner {
+    min-width: 100%;
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+}
+
+.code-line-wrapper {
+    display: flex;
+    flex-direction: column;
 }
 
 .line-number {
@@ -116,45 +137,65 @@
     user-select: none;
     width: 2rem;
     text-align: left;
-    margin-right: 1rem;
+    margin-right: 1vw;
+    flex-shrink: 0;
 }
 
 .issue-inline-container {
-    width: 100%;
-    background: #ffd0c0;
-    padding: 10px;
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background-color: #ffd0c0;
+    padding: 12px 18px;
     border: 1px solid var(--accent);
     border-left: 5px solid var(--accent);
-    margin-bottom: 5px;
+    border-radius: 8px;
+    margin: 8px 0;
+    box-sizing: border-box;
     white-space: normal;
     word-break: break-word;
-    line-height: 1.2;
+    line-height: 1.4;
     text-align: left;
+    width: 100cqw;
 }
 
-.issue-inline-container div {
-    width: 98%;
+.issue-inline-text {
+    color: var(--text);
+    font-size: 15px;
+}
+
+.issue-inline-text strong {
+    font-weight: 700;
 }
 
 .inline-explain-button {
-    background: var(--text);
+    background-color: var(--text);
     border: none;
     border-radius: 6px;
     color: white;
     font-size: 14px;
-    padding: 1.5vh 1.5vw;
+    padding: 10px 16px;
     cursor: pointer;
-    font-weight: 700;
-    margin-left: 1vw;
-    margin-right: 1vw;
-    margin-top: 1vh;
+    font-weight: 600;
     display: flex;
-    justify-self: flex-end;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.inline-explain-button:hover {
+    background-color: var(--accent);
+    transform: translateY(-1px);
 }
 
 .file-name {
     background: #ffd0c0;
-    padding: 4px 10px;
+    padding: 8px 14px;
     border: 1px solid var(--accent);
     margin-bottom: 5px;
     width: fit-content;
@@ -162,6 +203,14 @@
     font-weight: 700;
     margin-left: 1vw;
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.file-name svg {
+    display: flex;
+    flex-shrink: 0;
 }
 
 .chat-wrapper {
@@ -173,4 +222,60 @@
 
 .chat-wrapper.hidden {
     display: none;
+}
+
+/* CODE SYNTAX HIGHLIGHTING */
+
+.code-block .k {
+    color: #d73a49;
+    /* Palabras clave (import, from, const, return) */
+    font-weight: 600;
+}
+
+.code-block .st,
+.code-block .s {
+    color: #032f62;
+    /* Textos ("strings") */
+}
+
+.code-block .c,
+.code-block .cd {
+    color: #6a737d;
+    /* Comentarios */
+    font-style: italic;
+}
+
+.code-block .sym {
+    color: #005cc5;
+    /* Símbolos, nombres de clases o variables */
+}
+
+.code-block .sym-1 {
+    color: #22863a;
+    /* Verde para Clases y Objetos (ej. Path) */
+}
+
+.code-block .sym-2 {
+    color: #6f42c1;
+    /* Morado para Funciones y Métodos */
+}
+
+.code-block .sym-3 {
+    color: #e36209;
+    /* Naranja para Constantes Globales */
+}
+
+.code-block .sym-4 {
+    color: #008080;
+    /* Verde azulado (Teal) para Variables locales / Argumentos */
+}
+
+.code-block .sym-5 {
+    color: #b08800;
+    /* Amarillo oscuro para Atributos o Propiedades */
+}
+
+.code-block .sym-6 {
+    color: #d73a49;
+    /* Rojo para otros símbolos especiales */
 }
