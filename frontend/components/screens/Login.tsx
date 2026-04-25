@@ -2,6 +2,8 @@ import GitHubButton from "../buttons/GitHubButton";
 import { PiCheckCircleFill, PiShieldCheckFill } from "react-icons/pi";
 import { FaBrain } from "react-icons/fa";
 import "../../styles/screens/Login.css";
+/// <reference types="vite/client" />
+const baseUrl = import.meta.env.VITE_API_URL;
 
 function Login() {
   return (
@@ -37,7 +39,9 @@ function Login() {
           <h2>Tu asistente para un código de calidad</h2>
           <GitHubButton
             text="Iniciar sesión con GitHub"
-            onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/github"}
+            onClick={() =>
+              (window.location.href = `${baseUrl}/oauth2/authorization/github`)
+            }
           />
         </div>
       </div>
