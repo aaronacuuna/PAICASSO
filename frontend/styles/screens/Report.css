@@ -1,0 +1,27 @@
+.report-screen {
+    max-width: 100%;
+}
+
+.report-screen h2 {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 0.5vh;
+}
+
+.report-date {
+    color: var(--text);
+    opacity: 0.5;
+    font-size: 13px;
+    margin-bottom: 2vh;
+}
+
+.report-section {
+    margin-bottom: 3vh;
+}
+
+.report-section h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 1.5vh;
+    color: var(--text);
+}

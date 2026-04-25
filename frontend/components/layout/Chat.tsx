@@ -4,25 +4,34 @@ import "../../styles/screens/Chat.css";
 import LoadingChat from "../animations/LoadingChat";
 import { TypewriterText } from "../animations/TypewriterText";
 import type { Issue } from "../screens/Analysis";
+import { apiFetch } from "../../utils/apiFetch";
+import MarkdownRenderer from "./MarkdownRenderer";
+import { predefinedPrompts } from "../../utils/prompts";
+import Loading from "../animations/Loading";
 
 interface Message {
   id: number;
   text: string;
   sender: "user" | "assistant";
+  isNew?: boolean;
+}
+
+interface ApiMessage {
+  id: number;
+  contenido: string;
+  remitente: string;
+  timestamp: string;
 }
 
 interface ChatProps {
+  repoId?: string;
   incomingMessage?: string | null;
   onIncomingMessageHandled?: () => void;
   selectedIssue?: Issue | null;
 }
 
-interface PredefinedPrompt {
-  title: string;
-  prompt: string;
-}
-
 export default function Chat({
+  repoId,
   incomingMessage,
   onIncomingMessageHandled,
   selectedIssue,
@@ -31,30 +40,10 @@ export default function Chat({
   const [contextAdded, setContextAdded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [sesionId, setSesionId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastHandledMsgRef = useRef<string | null>(null);
-  const predefinedPrompts: PredefinedPrompt[] = [
-    {
-      title: "Analizar seguridad del código",
-      prompt:
-        "¿Puedes revisar este código y decirme si encuentras vulnerabilidades de seguridad?",
-    },
-    {
-      title: "Optimizar para mayor rendimiento",
-      prompt:
-        "¿Puedes revisar este código y sugerirme optimizaciones para mejorar su rendimiento?",
-    },
-    {
-      title: "Mejorar legibilidad",
-      prompt:
-        "¿Puedes revisar este código y sugerirme cambios para mejorar su legibilidad y mantenibilidad?",
-    },
-    {
-      title: "Crear tests unitarios",
-      prompt:
-        "¿Puedes revisar este código y sugerirme casos de prueba unitarios que debería tener para asegurar su correcto funcionamiento?",
-    },
-  ];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -64,7 +53,34 @@ export default function Chat({
     scrollToBottom();
   }, [messages, isLoading]);
 
-  function handleSendMessage(messageText?: string) {
+  useEffect(() => {
+    if (repoId) {
+      const loadMessages = async () => {
+        try {
+          setIsLoadingMessages(true);
+          const res = await apiFetch(`/api/llm/sesion/${repoId}/mensajes`);
+          if (res) {
+            setSesionId(res.sesionId);
+            setMessages(
+              res.mensajes.map((m: ApiMessage) => ({
+                id: m.id,
+                text: m.contenido,
+                sender: m.remitente === "usuario" ? "user" : "assistant",
+                isNew: false,
+              })),
+            );
+          }
+        } catch (error) {
+          console.error("Error al cargar mensajes del chat:", error);
+        } finally {
+          setIsLoadingMessages(false);
+        }
+      };
+      loadMessages();
+    }
+  }, [repoId]);
+
+  async function handleSendMessage(messageText?: string) {
     if (isLoading) return;
 
     const textToSend = messageText || prompt.trim();
@@ -80,15 +96,36 @@ export default function Chat({
     setPrompt("");
     setIsLoading(true);
 
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: Date.now() + 1,
-        text: "He revisado el contexto que me comentas. Esta es una respuesta mockeada de la IA respecto a tu consulta.",
-        sender: "assistant",
+    try {
+      const payload = {
+        repoId: repoId ? parseInt(repoId) : undefined,
+        sesionId,
+        mensaje: textToSend,
+        componentKey:
+          contextAdded && selectedIssue ? selectedIssue.file.name : null,
+        lineaError: contextAdded && selectedIssue ? selectedIssue.line : null,
       };
-      setMessages((prev) => [...prev, aiResponse]);
+
+      const data = await apiFetch("/api/llm/analizar", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      if (data) {
+        setSesionId(data.sesionId);
+        const aiResponse: Message = {
+          id: Date.now() + 1,
+          text: data.respuesta,
+          sender: "assistant",
+          isNew: true,
+        };
+        setMessages((prev) => [...prev, aiResponse]);
+      }
+    } catch (error) {
+      console.error("Error al enviar el mensaje:", error);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   }
 
   useEffect(() => {
@@ -107,7 +144,11 @@ export default function Chat({
   return (
     <div className="panel-content chat-content">
       <div className="chat-messages">
-        {messages.length === 0 ? (
+        {isLoadingMessages ? (
+          <div className="loading-messages">
+            <Loading />
+          </div>
+        ) : messages.length === 0 ? (
           <>
             <h3>Asistente Inteligente</h3>
             <p>
@@ -136,7 +177,13 @@ export default function Chat({
             {messages.map((msg) => (
               <div key={msg.id} className={`message ${msg.sender}`}>
                 {msg.sender === "assistant" ? (
-                  <TypewriterText text={msg.text} onTyping={scrollToBottom} />
+                  msg.isNew ? (
+                    <TypewriterText text={msg.text} onTyping={scrollToBottom}>
+                      {(text) => <MarkdownRenderer text={text} />}
+                    </TypewriterText>
+                  ) : (
+                    <MarkdownRenderer text={msg.text} />
+                  )
                 ) : (
                   msg.text
                 )}
@@ -158,7 +205,7 @@ export default function Chat({
               <FaPlus /> Añadir
             </button>
             <span className={`context-label ${contextAdded ? "added" : ""}`}>
-              {selectedIssue?.file.name}
+              {selectedIssue?.file.name.split("/").pop()}
             </span>
           </div>
         )}

@@ -9,6 +9,9 @@
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
 }
 
 .side-panel {
@@ -17,6 +20,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .issues-panel {
@@ -80,9 +84,11 @@
     margin-left: -1.2vw;
     text-align: left;
     overflow-y: auto;
+    overflow-x: hidden;
     scrollbar-width: none;
     min-width: 0;
-    /* Permite que el contenedor central encoja y no empuje al chat */
+    box-sizing: border-box;
+    max-width: 100%;
 }
 
 .analysis-container h1 {
@@ -91,6 +97,7 @@
     margin-top: 0;
     display: flex;
     flex-direction: row;
+    cursor: pointer;
 }
 
 .issues-list {
@@ -101,16 +108,16 @@
 }
 
 .code-block {
-    margin: 0;
     margin: 1vh 0vw;
     padding: 1vh 1vw;
     border: 1px solid var(--border);
-    flex: 1;
     display: flex;
     flex-direction: column;
     overflow-x: auto;
     scrollbar-width: none;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     border-radius: 8px;
     container-type: inline-size;
 }
@@ -217,7 +224,7 @@
     display: flex;
     flex: 1;
     min-height: 0;
-    width: 100%;
+    overflow: hidden;
 }
 
 .chat-wrapper.hidden {

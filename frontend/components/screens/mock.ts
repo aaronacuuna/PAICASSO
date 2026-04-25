@@ -59,18 +59,17 @@ export const mockIssues: Issue[] = [
   {
     id: 1,
     title: "Null Pointer Exception",
-    description:
-      "Posible null pointer en la línea 45 del archivo UserService.java",
     severity: "high",
     file: userServiceFile,
     line: 2,
+    type: "bug",
   },
   {
     id: 2,
     title: "Código duplicado",
-    description: "Código similar encontrado en Dashboard.tsx y MetricsCard.tsx similar encontrado en Dashboard.tsx y MetricsCard.tsx",
     severity: "medium",
     file: dashboardFile,
     line: 7,
+    type: "bug"
   },
 ];

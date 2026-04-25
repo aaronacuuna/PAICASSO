@@ -7,3 +7,5 @@ frontend/dist/
 frontend/.idea/
 
 .env
+
+.idea/*

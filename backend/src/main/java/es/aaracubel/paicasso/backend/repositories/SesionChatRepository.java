@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface SesionChatRepository extends JpaRepository<SesionChat, Long> {
 
-    Optional<SesionChat> findByInformeId(Long informeId);
+    Optional<SesionChat> findByRepositorioId(Long repositorioId);
 }

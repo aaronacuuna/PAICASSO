@@ -12,6 +12,7 @@ import {
   FaJs,
   FaReact,
   FaFileCode,
+  FaTimes,
 } from "react-icons/fa";
 import {
   SiTypescript,
@@ -27,6 +28,7 @@ import Loading from "../animations/Loading";
 import IssueCard from "../cards/IssueCard";
 import { type ApiMetrica } from "../../types/Metrica";
 import { apiFetch } from "../../utils/apiFetch";
+import Report from "./Report";
 
 export interface File {
   name: string;
@@ -40,6 +42,13 @@ export interface Issue {
   severity: "low" | "medium" | "high";
   file: File;
   line: number;
+}
+
+export interface ApiReport {
+  id: number;
+  fechaGeneracion: string;
+  diagnostico: string;
+  propuesta: string;
 }
 
 const getFileIcon = (filename?: string) => {
@@ -92,6 +101,7 @@ export default function Analysis() {
   const [repoName, setRepoName] = useState("");
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [chatMessage, setChatMessage] = useState<string | null>(null);
+  const [report, setReport] = useState<ApiReport | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -116,8 +126,16 @@ export default function Analysis() {
               },
             }),
           );
-
           setIssues(mappedIssues);
+
+          try {
+            const reportData = await apiFetch(`/api/llm/informe/${repoId}`);
+            if (reportData) {
+              setReport(reportData);
+            }
+          } catch (error) {
+            console.error("Error al cargar el reporte:", error);
+          }
         }
       } catch (error) {
         console.error("Error al cargar los datos:", error);
@@ -207,7 +225,7 @@ export default function Analysis() {
 
       {/* Contenido Central */}
       <div className="analysis-container">
-        <h1>
+        <h1 onClick={() => setSelectedIssue(null)}>
           Análisis Inteligente {">"}{" "}
           <span className="repo-name">{repoName}</span>
         </h1>
@@ -222,6 +240,10 @@ export default function Analysis() {
               <div className="file-name">
                 {getFileIcon(selectedIssue.file.name)}
                 {selectedIssue.file.name}
+                <FaTimes
+                  onClick={() => setSelectedIssue(null)}
+                  style={{ cursor: "pointer", opacity: 0.75 }}
+                />
               </div>
               <div className="file-content">
                 <pre className="code-block">
@@ -266,7 +288,7 @@ export default function Analysis() {
               </div>
             </div>
           ) : (
-            <p>Selecciona una incidencia para ver detalles.</p>
+            <Report report={report} />
           )}
         </div>
       </div>
@@ -284,6 +306,7 @@ export default function Analysis() {
         </button>
         <div className={`chat-wrapper ${!isChatOpen ? "hidden" : ""}`}>
           <Chat
+            repoId={repoId}
             incomingMessage={chatMessage}
             onIncomingMessageHandled={() => setChatMessage(null)}
             selectedIssue={selectedIssue}

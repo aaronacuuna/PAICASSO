@@ -3,6 +3,7 @@ package es.aaracubel.paicasso.backend.services;
 import es.aaracubel.paicasso.backend.dtos.AnalisisDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.aaracubel.paicasso.backend.dtos.RepositorioDTO;
 import es.aaracubel.paicasso.backend.entities.Analisis;
 import es.aaracubel.paicasso.backend.entities.Metrica;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,8 @@ public class SonarService {
 
     @Value("${sonarqube.security.token}")
     private String sonarToken;
+
+    private final RepositorioService repositorioService;
 
     public AnalisisDTO obtenerMetricas(String projectKey) {
         try {
@@ -158,14 +161,17 @@ public class SonarService {
         }
     }
 
-    public String obtenerContextoCodigo(String componentKey, int lineaError) {
+    public String obtenerContextoCodigo(String componentKey, Integer lineaError) {
+        if (componentKey == null || lineaError == null) {
+            return "// No se ha seleccionado un archivo específico.";
+        }
         try {
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setBasicAuth(sonarToken, "");
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
-            // Calculamos una "ventana" de código: 10 líneas por arriba y 10 por abajo del error
+            // Calculamos una ventana de código: 10 líneas por arriba y 10 por abajo del error
             int fromLine = Math.max(1, lineaError - 10);
             int toLine = lineaError + 10;
 
@@ -178,7 +184,6 @@ public class SonarService {
 
             StringBuilder codigo = new StringBuilder();
             for (JsonNode lineNode : lines) {
-                // SonarQube devuelve el código tal cual, línea a línea
                 codigo.append(lineNode.path("code").asText()).append("\n");
             }
 
@@ -188,5 +193,35 @@ public class SonarService {
             System.err.println("No se pudo obtener el código fuente de SonarQube: " + e.getMessage());
             return "// El código fuente original no está disponible.";
         }
+    }
+
+    public String construirContextoSonar(Long repoId, String componentKey, Integer lineaError) {
+        RepositorioDTO repositorio = repositorioService.obtenerRepositorio(repoId);
+        AnalisisDTO metricas = obtenerMetricas("paicasso_" + repositorio.getId().toString());
+
+        String bloqueCodigo;
+        if (componentKey != null && lineaError != null) {
+            String codigoFuente = obtenerContextoCodigo(componentKey, lineaError);
+            bloqueCodigo = "Fragmento del archivo '%s'. El problema está en la línea %d (el fragmento va de la línea %d a la %d):\n```java\n%s\n```"
+                      .formatted(componentKey, lineaError, Math.max(1, lineaError - 10), lineaError + 10, codigoFuente);
+        } else {
+            bloqueCodigo = "El usuario está haciendo una consulta general sobre el proyecto, sin apuntar a ningún archivo específico.";
+        }
+
+        return """
+            Proyecto: %s
+            Bugs: %d | Vulnerabilidades: %d | Code Smells: %d
+            Cobertura: %.1f%% | Duplicaciones: %.1f%%
+            
+            %s
+            """.formatted(
+                repositorio.getNombre(),
+                metricas.getBugs(),
+                metricas.getVulnerabilidades(),
+                metricas.getCodeSmells(),
+                metricas.getCobertura(),
+                metricas.getDuplicaciones(),
+                bloqueCodigo
+        );
     }
 }

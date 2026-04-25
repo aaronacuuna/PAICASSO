@@ -3,12 +3,18 @@ import { useState, useEffect } from "react";
 interface TypewriterTextProps {
   text: string;
   onTyping: () => void;
+  children?: (typedText: string) => React.ReactNode;
 }
 
-export function TypewriterText({ text, onTyping }: TypewriterTextProps) {
+export function TypewriterText({
+  text,
+  onTyping,
+  children,
+}: TypewriterTextProps) {
   const [displayedText, setDisplayedText] = useState("");
 
   useEffect(() => {
+    setDisplayedText("");
     let i = 0;
     const timer = setInterval(() => {
       if (i < text.length) {
@@ -18,10 +24,10 @@ export function TypewriterText({ text, onTyping }: TypewriterTextProps) {
       } else {
         clearInterval(timer);
       }
-    }, 10);
+    }, 15);
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text]);
 
-  return <>{displayedText}</>;
+  return <>{children ? children(displayedText) : displayedText}</>;
 }

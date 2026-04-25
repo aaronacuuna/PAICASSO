@@ -16,6 +16,6 @@ public class SesionChat {
     private String estado;
 
     @ManyToOne
-    @JoinColumn(name = "informe_id")
-    private Informe informe;
+    @JoinColumn(name = "repositorio_id")
+    private Repositorio repositorio;
 }

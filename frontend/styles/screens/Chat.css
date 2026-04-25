@@ -6,6 +6,9 @@
     flex: 1;
     min-height: 0;
     box-sizing: border-box;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    min-width: 0;
 }
 
 .chat-messages {
@@ -22,33 +25,119 @@
     display: flex;
     flex-direction: column;
     gap: 1.5vh;
+    min-width: 0;
+    overflow-x: hidden;
+    scrollbar-width: none;
 }
 
 .message {
-    padding: 8px 14px;
-    border-radius: 8px;
-    line-height: 1.1;
+    padding: 10px 14px;
+    border-radius: 12px;
+    line-height: 1.25;
     font-size: 15px;
-    word-break: initial;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 85%;
     white-space: pre-wrap;
 }
 
 .message.user {
     background-color: var(--accent);
     color: white;
-    font-weight: 600;
+    font-weight: 500;
     text-align: left;
     align-self: flex-end;
-    border-bottom-right-radius: 0px;
+    border-bottom-right-radius: 4px;
 }
 
 .message.assistant {
-    background-color: #fff;
-    border: 1px solid var(--border);
+    background-color: transparent;
+    border: none;
     color: var(--text);
     align-self: flex-start;
-    text-align: justify;
+    text-align: left;
+    padding: 4px 0;
+    max-width: 100%;
+    width: 100%;
+    min-width: 0;
     border-bottom-left-radius: 0px;
+}
+
+/* Estilos de Markdown - Ajustes Compactos Tipo Claude */
+.markdown-body {
+    width: 100%;
+    max-width: 100%;
+    font-size: 14.5px;
+    line-height: 1.25;
+    overflow-wrap: break-word;
+}
+
+.markdown-body * {
+    margin: 0;
+    padding: 0;
+}
+
+.markdown-body p + p {
+    margin-top: 0.1em;  /* ← solo este valor para ajustar separación entre párrafos */
+}
+
+.markdown-body ul,
+.markdown-body ol {
+    padding-left: 1.6em;  /* necesario para que se vean los bullets/números */
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+}
+
+.markdown-body li + li {
+    margin-top: 0.1em;
+}
+
+/* Bloques de Código Mejorados */
+.custom-code-block {
+    margin: 1.2em 0;
+    border-radius: 8px;
+    background-color: #1e1e1e;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+    max-width: 100%;
+}
+
+.custom-code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 14px;
+    background-color: #2d2d2d;
+    border-bottom: 1px solid #404040;
+}
+
+.language-badge {
+    color: #a0a0a0;
+    font-size: 12px;
+    font-family: var(--mono, monospace);
+    font-weight: 600;
+    text-transform: uppercase;
+    user-select: none;
+}
+
+/* Estilos para código en línea */
+.inline-code {
+    font-family: var(--mono, 'Menlo', 'Monaco', 'Courier New', monospace);
+    background-color: #ffeaea;
+    color: var(--accent, #e83e8c);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.85em;
+    word-break: break-word;
+    font-weight: 700;
+}
+
+/* Ocultar el scrollbar y arreglar márgenes del highlight */
+.custom-code-block pre {
+    scrollbar-width: thin;
+    max-width: 100%;
+    overflow-x: auto;
 }
 
 .message.loading {
@@ -108,6 +197,8 @@
     background-color: var(--bg);
     align-items: flex-end;
     padding-bottom: 2px;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .chat-input {
@@ -153,4 +244,45 @@
     font-weight: 700;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
+}
+
+.markdown-body li {
+    line-height: 1.25;
+    margin: 0;
+    padding: 0;
+}
+
+.markdown-body li + li {
+    margin-top: 0.1em;
+}
+
+.markdown-body pre {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    border: none;
+    white-space: pre-wrap;
+}
+
+.copy-btn {
+    background: transparent;
+    border: 1px solid #555;
+    color: #aaa;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.copy-btn:hover {
+    color: #fff;
+    border-color: #aaa;
+}
+
+.loading-messages {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
 }
