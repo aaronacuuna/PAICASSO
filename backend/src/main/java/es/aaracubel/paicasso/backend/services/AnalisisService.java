@@ -103,7 +103,7 @@ public class AnalisisService {
             String projectKey = "paicasso_" + repo.getId();
 
             ProcessBuilder sonarBuilder = new ProcessBuilder(
-                    "cmd.exe", "/c", "sonar-scanner.bat",
+                    "sonar-scanner",
                     "-Dsonar.projectKey=" + projectKey,
                     "-Dsonar.projectName=" + repo.getNombre(),
                     "-Dsonar.sources=.",
