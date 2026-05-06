@@ -26,6 +26,27 @@ function Home() {
     navigate(`/dashboard/${repo.id}`);
   };
 
+  const handleDeleteRepo = async (repoId: number) => {
+    if (!repositories) return;
+
+    const prevRepositories = [...repositories];
+    setRepositories(repositories.filter((repo) => repo.id !== repoId));
+
+    if (selectedRepo?.id === repoId) {
+      navigate("/");
+    }
+
+    try {
+      await apiFetch(`/api/repositorios/${repoId}`, {
+        method: "DELETE",
+      });
+    } catch (error) {
+      console.error("Error al desvincular el repositorio:", error);
+      setRepositories(prevRepositories);
+      alert("Hubo un error al desvincular el repositorio.");
+    }
+  };
+
   const fetchRepositories = async () => {
     try {
       setRepositories(null);
@@ -87,6 +108,7 @@ function Home() {
                   repo={repo}
                   onClick={() => handleSelectRepo(repo)}
                   selected={selectedRepo?.id === repo.id}
+                  onDelete={handleDeleteRepo}
                 />
               ))}
             </ul>

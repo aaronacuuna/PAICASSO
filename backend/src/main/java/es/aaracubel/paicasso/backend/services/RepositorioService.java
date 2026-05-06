@@ -93,4 +93,15 @@ public class RepositorioService {
                 .map(repo -> repositorioMapper.toDTO(repo, true))
                 .orElseThrow(() -> new RuntimeException("Repositorio no encontrado"));
     }
+
+    public void desvincularRepositorio(Long usuarioId, Long repoId) {
+        Repositorio repositorio = repositorioRepository.findById(repoId)
+                .orElseThrow(() -> new RuntimeException("Repositorio no encontrado"));
+
+        if (!repositorio.getUsuario().getId().equals(usuarioId)) {
+            throw new RuntimeException("No tienes permisos para desvincular este repositorio");
+        }
+
+        repositorioRepository.delete(repositorio);
+    }
 }

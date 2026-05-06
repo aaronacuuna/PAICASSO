@@ -7,12 +7,14 @@ import { FiTrash2, FiX } from "react-icons/fi";
 interface RepositoryCardProps {
   repo: Repository;
   onClick: () => void;
+  onDelete: (repoId: number) => void;
   selected?: boolean;
 }
 
 export default function RepositoryCard({
   repo,
   onClick,
+  onDelete,
   selected,
 }: RepositoryCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,8 +26,7 @@ export default function RepositoryCard({
 
   const handleConfirm = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Aquí llamaríamos a la API para borrar/desvincular
-    alert(`Se ha desvinculado el repositorio: ${repo.name}`);
+    onDelete(repo.id);
     setIsModalOpen(false);
   };
 

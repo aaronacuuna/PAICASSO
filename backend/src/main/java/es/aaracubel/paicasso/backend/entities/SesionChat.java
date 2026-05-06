@@ -1,5 +1,7 @@
 package es.aaracubel.paicasso.backend.entities;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -18,4 +20,7 @@ public class SesionChat {
     @ManyToOne
     @JoinColumn(name = "repositorio_id")
     private Repositorio repositorio;
+
+    @OneToMany(mappedBy = "sesionChat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Mensaje> mensajes;
 }

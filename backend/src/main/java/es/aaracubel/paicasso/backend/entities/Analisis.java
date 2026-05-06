@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "analisis")
@@ -42,4 +43,10 @@ public class Analisis {
     @ManyToOne
     @JoinColumn(name = "repositorio_id")
     private Repositorio repositorio;
+
+    @OneToOne(mappedBy = "analisis", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Informe informe;
+
+    @OneToMany(mappedBy = "analisis", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Metrica> metricas;
 }

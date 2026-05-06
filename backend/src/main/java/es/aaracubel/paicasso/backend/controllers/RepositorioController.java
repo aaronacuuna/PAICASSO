@@ -42,4 +42,11 @@ public class RepositorioController {
         RepositorioDTO repo = repositorioService.obtenerRepositorio(id);
         return ResponseEntity.ok(repo);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> desvincularRepositorio(@PathVariable Long id) {
+        Long usuarioId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+        repositorioService.desvincularRepositorio(usuarioId, id);
+        return ResponseEntity.noContent().build();
+    }
 }
