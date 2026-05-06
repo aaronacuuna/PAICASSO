@@ -142,6 +142,121 @@ public class AnalisisServiceTest {
     }
 
     @Test
+    void ejecutarAnalisisEnSegundoPlano_ConMaven_Exito() throws Exception {
+        ReflectionTestUtils.setField(analisisService, "sonarUrl", "http://sonar");
+        ReflectionTestUtils.setField(analisisService, "sonarToken", "token");
+
+        Repositorio repo = mock(Repositorio.class);
+        Usuario usuario = mock(Usuario.class);
+        when(repo.getId()).thenReturn(1L);
+        when(repo.getNombre()).thenReturn("TestRepo");
+        when(repo.getUrl()).thenReturn("https://github.com/paicasso/repo");
+        when(repo.getUsuario()).thenReturn(usuario);
+        when(usuario.getTokenAcceso()).thenReturn("token123");
+
+        Analisis analisis = new Analisis();
+        analisis.setId(10L);
+
+        when(repositorioRepository.findById(1L)).thenReturn(Optional.of(repo));
+        when(analisisRepository.findById(10L)).thenReturn(Optional.of(analisis));
+        when(sonarService.procesamientoCompletado(anyString())).thenReturn(true);
+        when(sonarService.obtenerMetricas(anyString())).thenReturn(new AnalisisDTO());
+        when(sonarService.obtenerDetalleIncidencias(anyString(), any(Analisis.class)))
+                .thenReturn(List.of(new Metrica()));
+
+        try (MockedConstruction<ProcessBuilder> pbMock = Mockito.mockConstruction(ProcessBuilder.class,
+                (mockPb, context) -> {
+                    Process processMock = mock(Process.class);
+                    lenient().when(processMock.waitFor()).thenReturn(0);
+                    lenient().when(processMock.getInputStream()).thenReturn(new ByteArrayInputStream("log".getBytes()));
+                    lenient().when(mockPb.start()).thenAnswer(inv -> {
+                        Object arg0 = context.arguments().get(0);
+                        if (arg0 instanceof String[]) {
+                            String[] cmd = (String[]) arg0;
+                            if (cmd.length > 0 && "git".equals(cmd[0])) {
+                                String cloneDir = cmd[cmd.length - 1];
+                                Files.createFile(Path.of(cloneDir).resolve("pom.xml"));
+                            }
+                        }
+                        return processMock;
+                    });
+                    lenient().when(mockPb.environment()).thenReturn(new HashMap<>());
+                })) {
+
+            analisisService.ejecutarAnalisisEnSegundoPlano(10L, 1L);
+            
+            // Debería instanciar git, mvn y sonar-scanner
+            assertEquals(3, pbMock.constructed().size());
+        }
+
+        verify(analisisRepository, times(1)).save(argThat(a -> a.getEstado() == EstadoAnalisis.COMPLETADO));
+    }
+
+    @Test
+    void ejecutarAnalisisEnSegundoPlano_ConMaven_FalloCompilacion() throws Exception {
+        ReflectionTestUtils.setField(analisisService, "sonarUrl", "http://sonar");
+        ReflectionTestUtils.setField(analisisService, "sonarToken", "token");
+
+        Repositorio repo = mock(Repositorio.class);
+        Usuario usuario = mock(Usuario.class);
+        when(repo.getId()).thenReturn(1L);
+        when(repo.getNombre()).thenReturn("TestRepo");
+        when(repo.getUrl()).thenReturn("https://github.com/paicasso/repo");
+        when(repo.getUsuario()).thenReturn(usuario);
+        when(usuario.getTokenAcceso()).thenReturn("token123");
+
+        Analisis analisis = new Analisis();
+        analisis.setId(10L);
+
+        when(repositorioRepository.findById(1L)).thenReturn(Optional.of(repo));
+        when(analisisRepository.findById(10L)).thenReturn(Optional.of(analisis));
+        when(sonarService.procesamientoCompletado(anyString())).thenReturn(true);
+        when(sonarService.obtenerMetricas(anyString())).thenReturn(new AnalisisDTO());
+        when(sonarService.obtenerDetalleIncidencias(anyString(), any(Analisis.class)))
+                .thenReturn(List.of(new Metrica()));
+
+        try (MockedConstruction<ProcessBuilder> pbMock = Mockito.mockConstruction(ProcessBuilder.class,
+                (mockPb, context) -> {
+                    Process processMock = mock(Process.class);
+                    lenient().when(processMock.getInputStream()).thenReturn(new ByteArrayInputStream("log".getBytes()));
+                    
+                    Object arg0 = context.arguments().get(0);
+                    boolean isMvn = false;
+                    if (arg0 instanceof String[]) {
+                        String[] cmd = (String[]) arg0;
+                        if (cmd.length > 0 && "mvn".equals(cmd[0])) {
+                            isMvn = true;
+                        }
+                    }
+                    final boolean mvn = isMvn;
+                    
+                    // Solo el proceso de mvn fallará
+                    lenient().when(processMock.waitFor()).thenAnswer(inv -> mvn ? 1 : 0);
+
+                    lenient().when(mockPb.start()).thenAnswer(inv -> {
+                        Object a0 = context.arguments().get(0);
+                        if (a0 instanceof String[]) {
+                            String[] cmd = (String[]) a0;
+                            if (cmd.length > 0 && "git".equals(cmd[0])) {
+                                String cloneDir = cmd[cmd.length - 1];
+                                Files.createFile(Path.of(cloneDir).resolve("pom.xml"));
+                            }
+                        }
+                        return processMock;
+                    });
+                    lenient().when(mockPb.environment()).thenReturn(new HashMap<>());
+                })) {
+
+            analisisService.ejecutarAnalisisEnSegundoPlano(10L, 1L);
+            
+            assertEquals(3, pbMock.constructed().size());
+        }
+
+        // Aunque falle Maven, el flujo continúa y esperamos que el análisis termine guardándose (el sonar-scanner dirá si pasa o no)
+        verify(analisisRepository, times(1)).save(argThat(a -> a.getEstado() == EstadoAnalisis.COMPLETADO));
+    }
+
+    @Test
     void ejecutarAnalisisEnSegundoPlano_FalloGit() throws Exception {
         Repositorio repo = mock(Repositorio.class);
         Usuario usuario = mock(Usuario.class);

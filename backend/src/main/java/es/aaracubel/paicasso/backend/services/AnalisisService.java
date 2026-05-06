@@ -79,8 +79,7 @@ public class AnalisisService {
 
             System.out.println("Descargando código de GitHub...");
             ProcessBuilder gitBuilder = new ProcessBuilder(
-                    "git", "clone", "--depth", "1", authUrl, directorioTemporal.toString()
-            );
+                    "git", "clone", "--depth", "1", authUrl, directorioTemporal.toString());
 
             gitBuilder.environment().put("GIT_LFS_SKIP_SMUDGE", "1");
             gitBuilder.redirectErrorStream(true);
@@ -99,6 +98,32 @@ public class AnalisisService {
                 throw new RuntimeException("Error al clonar el repositorio de GitHub. Código: " + gitExitCode);
             }
 
+            boolean esProyectoMaven = Files.exists(directorioTemporal.resolve("pom.xml"));
+            if (esProyectoMaven) {
+                System.out.println("Proyecto Maven detectado. Ejecutando compilación previa...");
+
+                ProcessBuilder mavenBuilder = new ProcessBuilder("mvn", "clean", "compile");
+                mavenBuilder.directory(directorioTemporal.toFile());
+                mavenBuilder.redirectErrorStream(true);
+                Process mavenProcess = mavenBuilder.start();
+
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(mavenProcess.getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        System.out.println("[MAVEN] " + line);
+                    }
+                }
+
+                int mavenExitCode = mavenProcess.waitFor();
+                if (mavenExitCode != 0) {
+                    System.err.println(
+                            "Advertencia: Falló la compilación de Maven. El análisis de Sonar podría fallar. Código: "
+                                    + mavenExitCode);
+                } else {
+                    System.out.println("Compilación Maven exitosa.");
+                }
+            }
+
             System.out.println("Ejecutando SonarScanner...");
             String projectKey = "paicasso_" + repo.getId();
 
@@ -107,9 +132,9 @@ public class AnalisisService {
                     "-Dsonar.projectKey=" + projectKey,
                     "-Dsonar.projectName=" + repo.getNombre(),
                     "-Dsonar.sources=.",
+                    esProyectoMaven ? "-Dsonar.java.binaries=target/classes" : "-Dsonar.java.binaries=.",
                     "-Dsonar.host.url=" + sonarUrl,
-                    "-Dsonar.token=" + sonarToken
-            );
+                    "-Dsonar.token=" + sonarToken);
 
             sonarBuilder.directory(directorioTemporal.toFile());
             sonarBuilder.redirectErrorStream(true);
@@ -183,7 +208,8 @@ public class AnalisisService {
     }
 
     private void borrarDirectorio(Path path) {
-        if (path == null || !Files.exists(path)) return;
+        if (path == null || !Files.exists(path))
+            return;
 
         try {
             Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
