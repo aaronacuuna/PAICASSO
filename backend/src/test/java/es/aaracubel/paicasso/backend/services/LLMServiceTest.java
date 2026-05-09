@@ -16,11 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -45,7 +47,8 @@ public class LLMServiceTest {
         ReflectionTestUtils.setField(llmService, "apiUrl", "http://mockapi");
         ReflectionTestUtils.setField(llmService, "apiKey", "mockKey");
 
-        when(promptBuilderService.construirPrompt(1L, "sonar", "msg")).thenReturn("Prompt de prueba");
+        when(promptBuilderService.construirPrompt(eq(1L), eq("sonar"), eq("msg"), anyList()))
+                .thenReturn("Prompt de prueba");
 
         String mockResponse = """
                 {
@@ -65,14 +68,15 @@ public class LLMServiceTest {
                             .thenReturn(ResponseEntity.ok(mockResponse));
                 })) {
 
-            String resultado = llmService.analizar(1L, "sonar", "msg");
+            String resultado = llmService.analizar(1L, "sonar", "msg", Collections.emptyList());
             assertEquals("Respuesta generada", resultado);
         }
     }
 
     @Test
     void analizar_Fallo() {
-        when(promptBuilderService.construirPrompt(1L, "sonar", "msg")).thenReturn("Prompt de prueba");
+        when(promptBuilderService.construirPrompt(eq(1L), eq("sonar"), eq("msg"), anyList()))
+                .thenReturn("Prompt de prueba");
 
         try (MockedConstruction<RestTemplate> mocked = Mockito.mockConstruction(RestTemplate.class,
                 (mockRestTemplate, context) -> {
@@ -80,7 +84,7 @@ public class LLMServiceTest {
                             .thenThrow(new RuntimeException("API caida"));
                 })) {
 
-            String resultado = llmService.analizar(1L, "sonar", "msg");
+            String resultado = llmService.analizar(1L, "sonar", "msg", Collections.emptyList());
             assertEquals("No se pudo obtener respuesta de la IA en este momento.", resultado);
         }
     }

@@ -81,8 +81,9 @@ class LLMControllerTest {
         sesion.setId(99L);
 
         when(chatService.obtenerSesion(5L)).thenReturn(sesion);
+        when(chatService.obtenerMensajes(99L)).thenReturn(Collections.emptyList());
         when(sonarService.construirContextoSonar(5L, "comp:key", 42)).thenReturn("contexto");
-        when(llmService.analizar(eq(1L), eq("contexto"), eq("¿Por qué falla esta línea?")))
+        when(llmService.analizar(eq(1L), eq("contexto"), eq("¿Por qué falla esta línea?"), anyList()))
                 .thenReturn("respuesta-LLM");
 
         mockMvc.perform(post("/api/llm/analizar")
@@ -94,7 +95,7 @@ class LLMControllerTest {
 
         verify(chatService).guardarMensaje(sesion, "¿Por qué falla esta línea?", "usuario");
         verify(chatService).guardarMensaje(sesion, "respuesta-LLM", "LLM");
-        verify(llmService).analizar(1L, "contexto", "¿Por qué falla esta línea?");
+        verify(llmService).analizar(eq(1L), eq("contexto"), eq("¿Por qué falla esta línea?"), anyList());
     }
 
     @Test

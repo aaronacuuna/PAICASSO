@@ -4,6 +4,8 @@ import es.aaracubel.paicasso.backend.dtos.AnalisisDTO;
 import es.aaracubel.paicasso.backend.dtos.RepositorioDTO;
 import es.aaracubel.paicasso.backend.entities.Analisis;
 import es.aaracubel.paicasso.backend.entities.Metrica;
+import es.aaracubel.paicasso.backend.repositories.AnalisisRepository;
+import es.aaracubel.paicasso.backend.repositories.MetricaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +31,12 @@ public class SonarServiceTest {
 
     @Mock
     private RepositorioService repositorioService;
+
+    @Mock
+    private AnalisisRepository analisisRepository;
+
+    @Mock
+    private MetricaRepository metricaRepository;
 
     @InjectMocks
     private SonarService sonarService;

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.aaracubel.paicasso.backend.dtos.RepositorioDTO;
 import es.aaracubel.paicasso.backend.entities.Analisis;
 import es.aaracubel.paicasso.backend.entities.Metrica;
+import es.aaracubel.paicasso.backend.repositories.AnalisisRepository;
+import es.aaracubel.paicasso.backend.repositories.MetricaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -29,7 +31,11 @@ public class SonarService {
     @Value("${sonarqube.security.token}")
     private String sonarToken;
 
+    private static final int MAX_INCIDENCIAS_EN_CONTEXTO = 30;
+
     private final RepositorioService repositorioService;
+    private final AnalisisRepository analisisRepository;
+    private final MetricaRepository metricaRepository;
 
     public AnalisisDTO obtenerMetricas(String projectKey) {
         try {
@@ -208,11 +214,17 @@ public class SonarService {
             bloqueCodigo = "El usuario está haciendo una consulta general sobre el proyecto, sin apuntar a ningún archivo específico.";
         }
 
+        String bloqueIncidencias = construirBloqueIncidencias(repoId);
+
         return """
             Proyecto: %s
             Bugs: %d | Vulnerabilidades: %d | Code Smells: %d
             Cobertura: %.1f%% | Duplicaciones: %.1f%%
-            
+
+            ### Incidencias detectadas
+            %s
+
+            ### Foco actual
             %s
             """.formatted(
                 repositorio.getNombre(),
@@ -221,7 +233,32 @@ public class SonarService {
                 metricas.getCodeSmells(),
                 metricas.getCobertura(),
                 metricas.getDuplicaciones(),
+                bloqueIncidencias,
                 bloqueCodigo
         );
+    }
+
+    private String construirBloqueIncidencias(Long repoId) {
+        return analisisRepository.findFirstByRepositorioIdOrderByFechaEjecucionDesc(repoId)
+                .map(analisis -> {
+                    List<Metrica> incidencias = metricaRepository.findByAnalisisId(analisis.getId());
+                    if (incidencias.isEmpty()) {
+                        return "(No hay incidencias registradas en el último análisis.)";
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    int total = incidencias.size();
+                    int limite = Math.min(total, MAX_INCIDENCIAS_EN_CONTEXTO);
+                    for (int i = 0; i < limite; i++) {
+                        Metrica m = incidencias.get(i);
+                        sb.append("- [").append(m.getSeveridad()).append("/").append(m.getTipo()).append("] ")
+                          .append(m.getArchivo()).append(":").append(m.getLinea())
+                          .append(" — ").append(m.getDescripcion()).append("\n");
+                    }
+                    if (total > limite) {
+                        sb.append("... (").append(total - limite).append(" incidencias más no mostradas)\n");
+                    }
+                    return sb.toString();
+                })
+                .orElse("(Aún no hay análisis ejecutado para este repositorio.)");
     }
 }

@@ -1,6 +1,7 @@
 package es.aaracubel.paicasso.backend.services;
 
 import es.aaracubel.paicasso.backend.dtos.ConfiguracionDTO;
+import es.aaracubel.paicasso.backend.entities.Mensaje;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,12 +11,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PromptBuilderService {
 
+    private static final int MAX_HISTORIAL = 20;
+
     private final ConfiguracionService configuracionService;
 
-    public String construirPrompt(Long usuarioId, String contexto, String mensaje) {
+    public String construirPrompt(Long usuarioId, String contexto, String mensaje, List<Mensaje> historial) {
         ConfiguracionDTO conf = configuracionService.obtenerConfiguracion(usuarioId);
-        String nivelExperiencia = conf.getExperienceLevel();
-        List<String> prioridades = conf.getPriorities();
+        String nivelExperiencia = conf.getExperienceLevel() != null ? conf.getExperienceLevel() : "";
+        List<String> prioridades = conf.getPriorities() != null ? conf.getPriorities() : List.of();
         boolean addComments = conf.isAddComments();
 
         String instruccionesNivel = switch (nivelExperiencia) {
@@ -41,26 +44,31 @@ public class PromptBuilderService {
                 ? "- Añade comentarios explicativos en todo el código que generes."
                 : "- No añadas comentarios en el código generado salvo que sean estrictamente necesarios.";
 
+        String bloqueHistorial = construirHistorial(historial);
+
         return """
             Eres PAICASSO, un asistente experto en calidad de software integrado con SonarQube.
             Tu objetivo es ayudar al desarrollador a entender y corregir los problemas de calidad \
             detectados en su código.
-            
+
             IMPORTANTE: Tu respuesta debe ser ÚNICAMENTE el mensaje final dirigido al usuario. No incluyas tu proceso de pensamiento ("thinking process"), notas de planificación, listas de pasos internos ni metadatos sobre tu rol.
-            
+
             REGLA DE ORO: Responde SIEMPRE de la forma MÁS BREVE y CONCISA posible. Ve directamente al grano, sin rodeos, sin introducciones largas ni conclusiones innecesarias. Limítate a dar la solución o explicación de la manera más directa.
-            
+
             ## Instrucciones de comportamiento según el nivel del desarrollador (%s)
             %s
-            
+
             ## Instrucciones sobre el código generado
             %s
             %s
-            
+
             ## Contexto del análisis de SonarQube
             %s
-            
-            ## Mensaje del usuario
+
+            ## Historial de la conversación
+            %s
+
+            ## Mensaje actual del usuario
             %s
             """.formatted(
                 nivelExperiencia,
@@ -68,8 +76,23 @@ public class PromptBuilderService {
                 instruccionComentarios,
                 instruccionesPrioridades,
                 contexto,
+                bloqueHistorial,
                 mensaje
         );
+    }
+
+    private String construirHistorial(List<Mensaje> historial) {
+        if (historial == null || historial.isEmpty()) {
+            return "(Sin mensajes previos. Esta es la primera intervención del usuario.)";
+        }
+        int desde = Math.max(0, historial.size() - MAX_HISTORIAL);
+        StringBuilder sb = new StringBuilder();
+        for (int i = desde; i < historial.size(); i++) {
+            Mensaje m = historial.get(i);
+            String rol = "usuario".equalsIgnoreCase(m.getRemitente()) ? "Usuario" : "PAICASSO";
+            sb.append(rol).append(": ").append(m.getContenido()).append("\n");
+        }
+        return sb.toString();
     }
 
     private String buildPrioridadesPrompt(List<String> prioridades) {

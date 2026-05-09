@@ -33,16 +33,26 @@ public class LLMController {
         // Obtener o crear sesión
         SesionChat sesion = chatService.obtenerSesion(request.getRepoId());
 
+        // Cargar historial ANTES de guardar el nuevo mensaje (memoria de la conversación)
+        List<Mensaje> historial = chatService.obtenerMensajes(sesion.getId());
+
         // Guardar mensaje del usuario
         chatService.guardarMensaje(sesion, request.getMensaje(), "usuario");
+
+        // Si el frontend envía solo el nombre del archivo, lo prefijamos con el projectKey
+        // que SonarQube espera ("paicasso_<repoId>:<archivo>").
+        String componentKey = request.getComponentKey();
+        if (componentKey != null && !componentKey.contains(":") && request.getRepoId() != null) {
+            componentKey = "paicasso_" + request.getRepoId() + ":" + componentKey;
+        }
 
         // Construir contexto y llamar a la IA
         String contexto = sonarService.construirContextoSonar(
                 request.getRepoId(),
-                request.getComponentKey(),
+                componentKey,
                 request.getLineaError()
         );
-        String respuesta = llmService.analizar(usuarioId, contexto, request.getMensaje());
+        String respuesta = llmService.analizar(usuarioId, contexto, request.getMensaje(), historial);
 
         // Guardar respuesta de la IA
         chatService.guardarMensaje(sesion, respuesta, "LLM");

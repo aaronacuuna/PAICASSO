@@ -32,7 +32,7 @@ public class PromptBuilderServiceTest {
 
         when(configuracionService.obtenerConfiguracion(1L)).thenReturn(config);
 
-        String prompt = promptBuilderService.construirPrompt(1L, "Contexto Sonar", "Mi mensaje");
+        String prompt = promptBuilderService.construirPrompt(1L, "Contexto Sonar", "Mi mensaje", Collections.emptyList());
 
         assertNotNull(prompt);
         assertTrue(prompt.contains("junior"));
@@ -54,7 +54,7 @@ public class PromptBuilderServiceTest {
 
         when(configuracionService.obtenerConfiguracion(1L)).thenReturn(config);
 
-        String prompt = promptBuilderService.construirPrompt(1L, "Contexto Sonar", "Otro mensaje");
+        String prompt = promptBuilderService.construirPrompt(1L, "Contexto Sonar", "Otro mensaje", Collections.emptyList());
 
         assertNotNull(prompt);
         assertTrue(prompt.contains("mid"));
@@ -72,7 +72,7 @@ public class PromptBuilderServiceTest {
 
         when(configuracionService.obtenerConfiguracion(1L)).thenReturn(config);
 
-        String prompt = promptBuilderService.construirPrompt(1L, "Contexto Sonar", "Senior mensaje");
+        String prompt = promptBuilderService.construirPrompt(1L, "Contexto Sonar", "Senior mensaje", Collections.emptyList());
 
         assertNotNull(prompt);
         assertTrue(prompt.contains("senior"));
@@ -89,11 +89,27 @@ public class PromptBuilderServiceTest {
 
         when(configuracionService.obtenerConfiguracion(1L)).thenReturn(config);
 
-        String prompt = promptBuilderService.construirPrompt(1L, "Context", "Def mensaje");
+        String prompt = promptBuilderService.construirPrompt(1L, "Context", "Def mensaje", Collections.emptyList());
 
         assertNotNull(prompt);
         assertTrue(prompt.contains("Responde de forma clara y técnica."));
         assertTrue(prompt.contains("Def mensaje"));
+    }
+
+    @Test
+    void construirPrompt_ConfiguracionNula() {
+        ConfiguracionDTO config = new ConfiguracionDTO();
+        config.setExperienceLevel(null);
+        config.setPriorities(null);
+        config.setAddComments(false);
+
+        when(configuracionService.obtenerConfiguracion(1L)).thenReturn(config);
+
+        String prompt = promptBuilderService.construirPrompt(1L, "Context", "Mensaje sin config", Collections.emptyList());
+
+        assertNotNull(prompt);
+        assertTrue(prompt.contains("Responde de forma clara y técnica."));
+        assertTrue(prompt.contains("Mensaje sin config"));
     }
 
     @Test

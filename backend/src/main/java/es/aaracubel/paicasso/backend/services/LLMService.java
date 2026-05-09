@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.aaracubel.paicasso.backend.dtos.InformeDTO;
 import es.aaracubel.paicasso.backend.entities.Analisis;
 import es.aaracubel.paicasso.backend.entities.Informe;
+import es.aaracubel.paicasso.backend.entities.Mensaje;
 import es.aaracubel.paicasso.backend.repositories.AnalisisRepository;
 import es.aaracubel.paicasso.backend.repositories.InformeRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +31,8 @@ public class LLMService {
     private final InformeRepository informeRepository;
     private final AnalisisRepository analisisRepository;
 
-    public String analizar(Long usuarioId, String contextoSonarQube, String preguntaUsuario) {
-        String prompt = promptBuilderService.construirPrompt(usuarioId, contextoSonarQube, preguntaUsuario);
+    public String analizar(Long usuarioId, String contextoSonarQube, String preguntaUsuario, List<Mensaje> historial) {
+        String prompt = promptBuilderService.construirPrompt(usuarioId, contextoSonarQube, preguntaUsuario, historial);
         return llamarLLM(prompt);
     }
 
