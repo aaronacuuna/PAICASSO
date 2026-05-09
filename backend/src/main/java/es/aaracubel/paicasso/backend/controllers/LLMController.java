@@ -2,6 +2,7 @@ package es.aaracubel.paicasso.backend.controllers;
 
 import es.aaracubel.paicasso.backend.dtos.InformeDTO;
 import es.aaracubel.paicasso.backend.dtos.LLMRequestDTO;
+import es.aaracubel.paicasso.backend.dtos.MensajeDTO;
 import es.aaracubel.paicasso.backend.entities.Mensaje;
 import es.aaracubel.paicasso.backend.entities.SesionChat;
 import es.aaracubel.paicasso.backend.services.ChatService;
@@ -67,7 +68,9 @@ public class LLMController {
     @GetMapping("/sesion/{repoId}/mensajes")
     public ResponseEntity<Map<String, Object>> obtenerMensajes(@PathVariable Long repoId) {
         SesionChat sesion = chatService.obtenerSesion(repoId);
-        List<Mensaje> mensajes = chatService.obtenerMensajes(sesion.getId());
+        List<MensajeDTO> mensajes = chatService.obtenerMensajes(sesion.getId()).stream()
+                .map(MensajeDTO::from)
+                .toList();
         return ResponseEntity.ok(Map.of(
                 "sesionId", sesion.getId(),
                 "mensajes", mensajes

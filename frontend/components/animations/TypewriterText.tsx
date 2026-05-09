@@ -24,7 +24,7 @@ export function TypewriterText({
       } else {
         clearInterval(timer);
       }
-    }, 15);
+    }, 3);
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text]);

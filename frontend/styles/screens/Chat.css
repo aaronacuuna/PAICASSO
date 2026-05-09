@@ -297,6 +297,25 @@
     background-color: var(--bg);
 }
 
+.copy-btn.copied {
+    background-color: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    animation: pulse 0.5s ease;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 .loading-messages {
     display: flex;
     justify-content: center;

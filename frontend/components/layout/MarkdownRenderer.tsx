@@ -2,6 +2,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { useState } from "react";
 
 const remarkTightLists = () => (tree: any) => {
   const visit = (node: any) => {
@@ -18,6 +19,59 @@ const remarkTightLists = () => (tree: any) => {
 
 interface MarkdownRendererProps {
   text: string;
+}
+
+interface CodeBlockProps {
+  codeText: string;
+  language: string;
+}
+
+function CodeBlock({ codeText, language }: CodeBlockProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(codeText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="custom-code-block">
+      <div className="custom-code-header">
+        <span className="language-badge">{language}</span>
+        <button
+          className={`copy-btn ${copied ? "copied" : ""}`}
+          onClick={handleCopy}
+        >
+          {copied ? "¡Copiado!" : "Copiar"}
+        </button>
+      </div>
+      <SyntaxHighlighter
+        style={oneLight as any}
+        language={language}
+        PreTag="pre"
+        customStyle={{
+          margin: 0,
+          padding: "10px 6px 10px 8px",
+          borderRadius: "0 0 8px 8px",
+          background: "var(--code-bg)",
+          fontSize: "13px",
+          fontFamily: "var(--mono, monospace)",
+          whiteSpace: "pre",
+          overflowX: "auto",
+        }}
+        codeTagProps={{
+          style: {
+            fontFamily: "var(--mono, monospace)",
+            whiteSpace: "pre",
+            background: "transparent",
+          },
+        }}
+      >
+        {codeText}
+      </SyntaxHighlighter>
+    </div>
+  );
 }
 
 export default function MarkdownRenderer({ text }: MarkdownRendererProps) {
@@ -95,43 +149,7 @@ export default function MarkdownRenderer({ text }: MarkdownRendererProps) {
               return <pre>{children}</pre>;
             }
 
-            return (
-              <div className="custom-code-block">
-                <div className="custom-code-header">
-                  <span className="language-badge">{match[1]}</span>
-                  <button
-                    className="copy-btn"
-                    onClick={() => navigator.clipboard.writeText(codeText)}
-                  >
-                    Copiar
-                  </button>
-                </div>
-                <SyntaxHighlighter
-                  style={oneLight as any}
-                  language={match[1]}
-                  PreTag="pre"
-                  customStyle={{
-                    margin: 0,
-                    padding: "10px 6px 10px 8px",
-                    borderRadius: "0 0 8px 8px",
-                    background: "var(--code-bg)",
-                    fontSize: "13px",
-                    fontFamily: "var(--mono, monospace)",
-                    whiteSpace: "pre",
-                    overflowX: "auto",
-                  }}
-                  codeTagProps={{
-                    style: {
-                      fontFamily: "var(--mono, monospace)",
-                      whiteSpace: "pre",
-                      background: "transparent",
-                    },
-                  }}
-                >
-                  {codeText}
-                </SyntaxHighlighter>
-              </div>
-            );
+            return <CodeBlock codeText={codeText} language={match[1]} />;
           },
           code({ className, children }: any) {
             return (
