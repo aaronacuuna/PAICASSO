@@ -1,7 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const remarkTightLists = () => (tree: any) => {
   const visit = (node: any) => {
@@ -71,44 +71,71 @@ export default function MarkdownRenderer({ text }: MarkdownRendererProps) {
               </span>
             );
           },
-          code({ inline, className, children, ...props }: any) {
-            const match = /language-(\w+)/.exec(className || "");
-            const codeText = String(children).replace(/\n$/, "");
-            if (!inline && match) {
-              return (
-                <div className="custom-code-block">
-                  <div className="custom-code-header">
-                    <span className="language-badge">{match[1]}</span>
-                    <button
-                      className="copy-btn"
-                      onClick={() => navigator.clipboard.writeText(codeText)}
-                    >
-                      Copiar
-                    </button>
-                  </div>
-                  <SyntaxHighlighter
-                    {...props}
-                    style={vscDarkPlus as any}
-                    language={match[1]}
-                    PreTag="div"
-                    wrapLongLines={true}
-                    customStyle={{
-                      margin: 0,
-                      padding: "12px",
-                      borderRadius: "0 0 8px 8px",
-                      backgroundColor: "#1e1e1e",
-                      fontSize: "13px",
-                      whiteSpace: "pre-wrap",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    {codeText}
-                  </SyntaxHighlighter>
-                </div>
-              );
+          pre({ children }: any) {
+            const codeChild = Array.isArray(children) ? children[0] : children;
+            const className: string = codeChild?.props?.className || "";
+            const match = /language-(\w+)/.exec(className);
+            const rawChildren = codeChild?.props?.children;
+            const rawText = Array.isArray(rawChildren)
+              ? rawChildren.join("")
+              : String(rawChildren ?? "");
+            const dedent = (src: string) => {
+              const lines = src.replace(/\n$/, "").split("\n");
+              const indents = lines
+                .filter((l) => l.trim().length > 0)
+                .map((l) => l.match(/^[ \t]*/)?.[0].length ?? 0);
+              const min = indents.length ? Math.min(...indents) : 0;
+              return min > 0
+                ? lines.map((l) => l.slice(min)).join("\n")
+                : lines.join("\n");
+            };
+            const codeText = dedent(rawText);
+
+            if (!match) {
+              return <pre>{children}</pre>;
             }
+
             return (
-              <code {...props} className={`inline-code ${className || ""}`}>
+              <div className="custom-code-block">
+                <div className="custom-code-header">
+                  <span className="language-badge">{match[1]}</span>
+                  <button
+                    className="copy-btn"
+                    onClick={() => navigator.clipboard.writeText(codeText)}
+                  >
+                    Copiar
+                  </button>
+                </div>
+                <SyntaxHighlighter
+                  style={oneLight as any}
+                  language={match[1]}
+                  PreTag="pre"
+                  customStyle={{
+                    margin: 0,
+                    padding: "10px 6px 10px 8px",
+                    borderRadius: "0 0 8px 8px",
+                    background: "var(--code-bg)",
+                    fontSize: "13px",
+                    fontFamily: "var(--mono, monospace)",
+                    whiteSpace: "pre",
+                    overflowX: "auto",
+                  }}
+                  codeTagProps={{
+                    style: {
+                      fontFamily: "var(--mono, monospace)",
+                      whiteSpace: "pre",
+                      background: "transparent",
+                    },
+                  }}
+                >
+                  {codeText}
+                </SyntaxHighlighter>
+              </div>
+            );
+          },
+          code({ className, children }: any) {
+            return (
+              <code className={`inline-code ${className || ""}`}>
                 {children}
               </code>
             );
