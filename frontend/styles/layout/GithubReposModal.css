@@ -106,6 +106,36 @@
   flex-direction: column;
 }
 
+.link-by-url {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.link-by-url-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background-color: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.link-by-url-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(226, 125, 96, 0.12);
+}
+
+.link-by-url .link-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .loading-center {
   display: flex;
   flex: 1;

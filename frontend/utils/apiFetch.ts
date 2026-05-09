@@ -26,7 +26,14 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   }
 
   if (!response.ok) {
-    throw new Error(`Error en la petición: ${response.status}`);
+    let backendMessage = "";
+    try {
+      const errBody = await response.clone().json();
+      backendMessage = errBody?.error || errBody?.message || "";
+    } catch {
+      backendMessage = await response.clone().text().catch(() => "");
+    }
+    throw new Error(backendMessage || `Error en la petición: ${response.status}`);
   }
 
   if (response.status === 204) {

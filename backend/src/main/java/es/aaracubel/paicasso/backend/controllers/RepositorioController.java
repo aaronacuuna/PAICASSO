@@ -3,11 +3,13 @@ package es.aaracubel.paicasso.backend.controllers;
 import es.aaracubel.paicasso.backend.dtos.RepositorioDTO;
 import es.aaracubel.paicasso.backend.services.RepositorioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/repositorios")
@@ -35,6 +37,17 @@ public class RepositorioController {
         Long usuarioId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
         RepositorioDTO nuevoRepo = repositorioService.vincularRepositorio(usuarioId, repositorioDTO);
         return ResponseEntity.ok(nuevoRepo);
+    }
+
+    @PostMapping("/url")
+    public ResponseEntity<?> vincularRepositorioPorUrl(@RequestBody RepositorioDTO repositorioDTO) {
+        Long usuarioId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+        try {
+            RepositorioDTO nuevoRepo = repositorioService.vincularRepositorioPorUrl(usuarioId, repositorioDTO.getUrl());
+            return ResponseEntity.ok(nuevoRepo);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}")

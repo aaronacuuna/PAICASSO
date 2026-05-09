@@ -31,6 +31,8 @@ function GithubReposModal({
 }: GithubReposModalProps) {
   const [githubRepos, setGithubRepos] = useState<Repository[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [urlInput, setUrlInput] = useState("");
+  const [linkingByUrl, setLinkingByUrl] = useState(false);
 
   const getLanguageIcon = (lang: string | null) => {
     if (!lang) return null;
@@ -78,6 +80,26 @@ function GithubReposModal({
     }
   };
 
+  const vincularRepoPorUrl = async () => {
+    if (!urlInput.trim()) return;
+    setLinkingByUrl(true);
+    try {
+      await apiFetch("/api/repositorios/url", {
+        method: "POST",
+        body: JSON.stringify({ url: urlInput.trim() }),
+      });
+      setUrlInput("");
+      onRepoLinked();
+      onClose();
+    } catch (error) {
+      console.error("Error al vincular el repositorio por URL:", error);
+      const msg = error instanceof Error ? error.message : "Error desconocido";
+      alert(`No se pudo vincular el repositorio: ${msg}`);
+    } finally {
+      setLinkingByUrl(false);
+    }
+  };
+
   const vincularRepo = async (repo: Repository) => {
     try {
       await apiFetch("/api/repositorios", {
@@ -116,6 +138,24 @@ function GithubReposModal({
         </div>
 
         <div className="modal-body">
+          <div className="link-by-url">
+            <input
+              type="text"
+              className="link-by-url-input"
+              placeholder="https://github.com/usuario/repositorio"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              disabled={linkingByUrl}
+            />
+            <button
+              className="link-button"
+              onClick={vincularRepoPorUrl}
+              disabled={linkingByUrl || !urlInput.trim()}
+            >
+              <FiPlus size={16} /> Vincular
+            </button>
+          </div>
+
           {loading || !githubRepos ? (
             <div className="loading-center">
               <Loading />

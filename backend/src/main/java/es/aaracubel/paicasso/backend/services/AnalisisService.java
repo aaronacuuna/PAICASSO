@@ -102,25 +102,34 @@ public class AnalisisService {
             if (esProyectoMaven) {
                 System.out.println("Proyecto Maven detectado. Ejecutando compilación previa...");
 
-                ProcessBuilder mavenBuilder = new ProcessBuilder("mvn", "clean", "compile");
+                List<String> mavenCmd = construirComandoMaven(directorioTemporal);
+                ProcessBuilder mavenBuilder = new ProcessBuilder(mavenCmd);
                 mavenBuilder.directory(directorioTemporal.toFile());
                 mavenBuilder.redirectErrorStream(true);
-                Process mavenProcess = mavenBuilder.start();
 
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(mavenProcess.getInputStream()))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        System.out.println("[MAVEN] " + line);
+                try {
+                    Process mavenProcess = mavenBuilder.start();
+
+                    try (BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(mavenProcess.getInputStream()))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            System.out.println("[MAVEN] " + line);
+                        }
                     }
-                }
 
-                int mavenExitCode = mavenProcess.waitFor();
-                if (mavenExitCode != 0) {
+                    int mavenExitCode = mavenProcess.waitFor();
+                    if (mavenExitCode != 0) {
+                        System.err.println(
+                                "Advertencia: Falló la compilación de Maven. El análisis de Sonar podría perder precisión en Java. Código: "
+                                        + mavenExitCode);
+                    } else {
+                        System.out.println("Compilación Maven exitosa.");
+                    }
+                } catch (IOException e) {
                     System.err.println(
-                            "Advertencia: Falló la compilación de Maven. El análisis de Sonar podría fallar. Código: "
-                                    + mavenExitCode);
-                } else {
-                    System.out.println("Compilación Maven exitosa.");
+                            "Advertencia: No se pudo lanzar Maven (" + e.getMessage()
+                                    + "). Continuando sin compilar; el análisis de Java perderá precisión.");
                 }
             }
 
@@ -128,7 +137,7 @@ public class AnalisisService {
             String projectKey = "paicasso_" + repo.getId();
 
             ProcessBuilder sonarBuilder = new ProcessBuilder(
-                    "sonar-scanner",
+                    "cmd.exe", "/c", "sonar-scanner.bat",
                     "-Dsonar.projectKey=" + projectKey,
                     "-Dsonar.projectName=" + repo.getNombre(),
                     "-Dsonar.sources=.",
@@ -205,6 +214,24 @@ public class AnalisisService {
         } finally {
             borrarDirectorio(directorioTemporal);
         }
+    }
+
+    private List<String> construirComandoMaven(Path directorioProyecto) {
+        boolean esWindows = System.getProperty("os.name").toLowerCase().contains("win");
+        String wrapper = esWindows ? "mvnw.cmd" : "mvnw";
+        boolean tieneWrapper = Files.exists(directorioProyecto.resolve(wrapper));
+
+        if (tieneWrapper) {
+            System.out.println("Usando Maven Wrapper del repositorio (" + wrapper + ").");
+            return esWindows
+                    ? List.of("cmd.exe", "/c", wrapper, "clean", "compile")
+                    : List.of("./" + wrapper, "clean", "compile");
+        }
+
+        System.out.println("Maven Wrapper no encontrado. Usando Maven del sistema.");
+        return esWindows
+                ? List.of("cmd.exe", "/c", "mvn.cmd", "clean", "compile")
+                : List.of("mvn", "clean", "compile");
     }
 
     private void borrarDirectorio(Path path) {
