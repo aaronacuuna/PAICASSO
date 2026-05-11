@@ -136,14 +136,29 @@ public class AnalisisService {
             System.out.println("Ejecutando SonarScanner...");
             String projectKey = "paicasso_" + repo.getId();
 
-            ProcessBuilder sonarBuilder = new ProcessBuilder(
-                    "cmd.exe", "/c", "sonar-scanner.bat",
-                    "-Dsonar.projectKey=" + projectKey,
-                    "-Dsonar.projectName=" + repo.getNombre(),
-                    "-Dsonar.sources=.",
-                    esProyectoMaven ? "-Dsonar.java.binaries=target/classes" : "-Dsonar.java.binaries=.",
-                    "-Dsonar.host.url=" + sonarUrl,
-                    "-Dsonar.token=" + sonarToken);
+            boolean esWindows = System.getProperty("os.name").toLowerCase().contains("win");
+            String sonarCmd = esWindows ? "sonar-scanner.bat" : "sonar-scanner";
+
+            ProcessBuilder sonarBuilder;
+            if (esWindows) {
+                sonarBuilder = new ProcessBuilder(
+                        "cmd.exe", "/c", sonarCmd,
+                        "-Dsonar.projectKey=" + projectKey,
+                        "-Dsonar.projectName=" + repo.getNombre(),
+                        "-Dsonar.sources=.",
+                        esProyectoMaven ? "-Dsonar.java.binaries=target/classes" : "-Dsonar.java.binaries=.",
+                        "-Dsonar.host.url=" + sonarUrl,
+                        "-Dsonar.token=" + sonarToken);
+            } else {
+                sonarBuilder = new ProcessBuilder(
+                        sonarCmd,
+                        "-Dsonar.projectKey=" + projectKey,
+                        "-Dsonar.projectName=" + repo.getNombre(),
+                        "-Dsonar.sources=.",
+                        esProyectoMaven ? "-Dsonar.java.binaries=target/classes" : "-Dsonar.java.binaries=.",
+                        "-Dsonar.host.url=" + sonarUrl,
+                        "-Dsonar.token=" + sonarToken);
+            }
 
             sonarBuilder.directory(directorioTemporal.toFile());
             sonarBuilder.redirectErrorStream(true);
