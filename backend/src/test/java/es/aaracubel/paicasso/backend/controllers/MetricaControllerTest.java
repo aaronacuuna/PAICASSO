@@ -2,16 +2,23 @@ package es.aaracubel.paicasso.backend.controllers;
 
 import es.aaracubel.paicasso.backend.dtos.MetricaDTO;
 import es.aaracubel.paicasso.backend.services.MetricaService;
+import es.aaracubel.paicasso.backend.services.RepositorioService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -29,6 +36,21 @@ class MetricaControllerTest {
 
     @MockitoBean
     private MetricaService metricaService;
+
+    @MockitoBean
+    private RepositorioService repositorioService;
+
+    @BeforeEach
+    void setUp() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("1", null, Collections.emptyList())
+        );
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void obtenerIncidenciasPorRepo_Exito_DevuelveOk() throws Exception {
@@ -65,23 +87,23 @@ class MetricaControllerTest {
 
     @Test
     void obtenerCodigoIncidencia_Exito_DevuelveOk() throws Exception {
-        when(metricaService.obtenerCodigoDeIncidencia(5L)).thenReturn("public class Main {}");
+        when(metricaService.obtenerCodigoDeIncidencia(eq(5L), eq(1L))).thenReturn("public class Main {}");
 
         mockMvc.perform(get("/api/incidencias/5/codigo"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value("public class Main {}"));
 
-        verify(metricaService).obtenerCodigoDeIncidencia(5L);
+        verify(metricaService).obtenerCodigoDeIncidencia(5L, 1L);
     }
 
     @Test
     void obtenerCodigoIncidencia_Error_DevuelveNotFound() throws Exception {
-        when(metricaService.obtenerCodigoDeIncidencia(404L))
+        when(metricaService.obtenerCodigoDeIncidencia(eq(404L), eq(1L)))
                 .thenThrow(new RuntimeException("Incidencia no encontrada"));
 
         mockMvc.perform(get("/api/incidencias/404/codigo"))
                 .andExpect(status().isNotFound());
 
-        verify(metricaService).obtenerCodigoDeIncidencia(404L);
+        verify(metricaService).obtenerCodigoDeIncidencia(404L, 1L);
     }
 }

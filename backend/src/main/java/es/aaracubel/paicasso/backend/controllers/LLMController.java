@@ -8,6 +8,7 @@ import es.aaracubel.paicasso.backend.entities.SesionChat;
 import es.aaracubel.paicasso.backend.services.ChatService;
 import es.aaracubel.paicasso.backend.services.InformeService;
 import es.aaracubel.paicasso.backend.services.LLMService;
+import es.aaracubel.paicasso.backend.services.RepositorioService;
 import es.aaracubel.paicasso.backend.services.SonarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +27,12 @@ public class LLMController {
     private final SonarService sonarService;
     private final ChatService chatService;
     private final InformeService informeService;
+    private final RepositorioService repositorioService;
 
     @PostMapping("/analizar")
     public ResponseEntity<Map<String, Object>> analizar(@RequestBody LLMRequestDTO request) {
         Long usuarioId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+        repositorioService.validarAcceso(request.getRepoId(), usuarioId);
 
         // Obtener o crear sesión
         SesionChat sesion = chatService.obtenerSesion(request.getRepoId());
@@ -67,6 +70,8 @@ public class LLMController {
 
     @GetMapping("/sesion/{repoId}/mensajes")
     public ResponseEntity<Map<String, Object>> obtenerMensajes(@PathVariable Long repoId) {
+        Long usuarioId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+        repositorioService.validarAcceso(repoId, usuarioId);
         SesionChat sesion = chatService.obtenerSesion(repoId);
         List<MensajeDTO> mensajes = chatService.obtenerMensajes(sesion.getId()).stream()
                 .map(MensajeDTO::from)
@@ -79,6 +84,8 @@ public class LLMController {
 
     @GetMapping("/informe/{repoId}")
     public ResponseEntity<InformeDTO> obtenerInforme(@PathVariable Long repoId){
+        Long usuarioId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+        repositorioService.validarAcceso(repoId, usuarioId);
         InformeDTO informe = informeService.obtenerInforme(repoId);
         if (informe == null) {
             String contextoSonar = sonarService.construirContextoSonar(repoId, null, null);

@@ -52,6 +52,8 @@ public class RepositorioController {
 
     @GetMapping("/{id}")
     public ResponseEntity<RepositorioDTO> obtenerRepositorio(@PathVariable Long id) {
+        Long usuarioId = Long.parseLong(SecurityContextHolder.getContext().getAuthentication().getName());
+        repositorioService.validarAcceso(id, usuarioId);
         RepositorioDTO repo = repositorioService.obtenerRepositorio(id);
         return ResponseEntity.ok(repo);
     }

@@ -7,6 +7,7 @@ import es.aaracubel.paicasso.backend.mappers.RepositorioMapper;
 import es.aaracubel.paicasso.backend.repositories.RepositorioRepository;
 import es.aaracubel.paicasso.backend.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -166,6 +167,12 @@ public class RepositorioService {
                 .build();
 
         return vincularRepositorio(usuarioId, dto);
+    }
+
+    public void validarAcceso(Long repoId, Long usuarioId) {
+        if (!repositorioRepository.existsByIdAndUsuarioId(repoId, usuarioId)) {
+            throw new AccessDeniedException("Acceso denegado al repositorio");
+        }
     }
 
     public RepositorioDTO obtenerRepositorio(Long repoId) {

@@ -8,6 +8,7 @@ import es.aaracubel.paicasso.backend.entities.SesionChat;
 import es.aaracubel.paicasso.backend.services.ChatService;
 import es.aaracubel.paicasso.backend.services.InformeService;
 import es.aaracubel.paicasso.backend.services.LLMService;
+import es.aaracubel.paicasso.backend.services.RepositorioService;
 import es.aaracubel.paicasso.backend.services.SonarService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,6 +56,9 @@ class LLMControllerTest {
 
     @MockitoBean
     private InformeService informeService;
+
+    @MockitoBean
+    private RepositorioService repositorioService;
 
     @BeforeEach
     void setUp() {

@@ -4,6 +4,7 @@ import es.aaracubel.paicasso.backend.dtos.MetricaDTO;
 import es.aaracubel.paicasso.backend.entities.Analisis;
 import es.aaracubel.paicasso.backend.entities.Metrica;
 import es.aaracubel.paicasso.backend.entities.Repositorio;
+import es.aaracubel.paicasso.backend.entities.Usuario;
 import es.aaracubel.paicasso.backend.mappers.MetricaMapper;
 import es.aaracubel.paicasso.backend.repositories.AnalisisRepository;
 import es.aaracubel.paicasso.backend.repositories.MetricaRepository;
@@ -58,8 +59,13 @@ public class MetricaServiceTest {
 
     @Test
     void obtenerCodigoDeIncidencia() {
+        Usuario usuario = new Usuario();
+        usuario.setId(42L);
+
         Repositorio repo = new Repositorio();
         repo.setId(5L);
+        repo.setUsuario(usuario);
+
         Analisis analisis = new Analisis();
         analisis.setRepositorio(repo);
 
@@ -72,7 +78,7 @@ public class MetricaServiceTest {
         when(sonarService.obtenerContextoCodigo("paicasso_5:src/main/Main.java", 20))
                 .thenReturn("public void test() {}");
 
-        String resultado = metricaService.obtenerCodigoDeIncidencia(1L);
+        String resultado = metricaService.obtenerCodigoDeIncidencia(1L, 42L);
 
         assertEquals("public void test() {}", resultado);
     }

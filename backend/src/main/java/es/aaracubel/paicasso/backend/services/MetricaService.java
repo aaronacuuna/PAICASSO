@@ -7,7 +7,9 @@ import es.aaracubel.paicasso.backend.mappers.MetricaMapper;
 import es.aaracubel.paicasso.backend.repositories.AnalisisRepository;
 import es.aaracubel.paicasso.backend.repositories.MetricaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,9 +34,14 @@ public class MetricaService {
                 .collect(Collectors.toList());
     }
 
-    public String obtenerCodigoDeIncidencia(Long incidenciaId) {
+    public String obtenerCodigoDeIncidencia(Long incidenciaId, Long usuarioId) {
         Metrica incidencia = metricaRepository.findById(incidenciaId)
                 .orElseThrow(() -> new RuntimeException("Incidencia no encontrada"));
+
+        Long propietarioId = incidencia.getAnalisis().getRepositorio().getUsuario().getId();
+        if (!propietarioId.equals(usuarioId)) {
+            throw new AccessDeniedException("Acceso denegado a la incidencia");
+        }
 
         Long repoId = incidencia.getAnalisis().getRepositorio().getId();
         String projectKey = "paicasso_" + repoId;

@@ -3,15 +3,21 @@ package es.aaracubel.paicasso.backend.controllers;
 import es.aaracubel.paicasso.backend.dtos.AnalisisDTO;
 import es.aaracubel.paicasso.backend.entities.EstadoAnalisis;
 import es.aaracubel.paicasso.backend.services.AnalisisService;
+import es.aaracubel.paicasso.backend.services.RepositorioService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -30,6 +36,21 @@ class AnalisisControllerTest {
 
     @MockitoBean
     private AnalisisService analisisService;
+
+    @MockitoBean
+    private RepositorioService repositorioService;
+
+    @BeforeEach
+    void setUp() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("1", null, Collections.emptyList())
+        );
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void getUltimoAnalisis_Existente_DevuelveOk() throws Exception {
