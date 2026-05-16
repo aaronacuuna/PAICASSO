@@ -35,7 +35,7 @@ public class AnalisisMapperTest {
         analisis.setTotalVulnerabilidades(2);
         analisis.setTotalCodeSmells(10);
         analisis.setLineasCodigo(100);
-        analisis.setCobertura(80.5);
+        analisis.setCobertura(null);
         analisis.setDuplicaciones(5.0);
 
         AnalisisDTO dto = mapper.toDTO(analisis);
@@ -48,7 +48,7 @@ public class AnalisisMapperTest {
         assertEquals(2, dto.getVulnerabilidades());
         assertEquals(10, dto.getCodeSmells());
         assertEquals(100, dto.getLineasCodigo());
-        assertEquals(80.5, dto.getCobertura());
+        assertNull(dto.getCobertura());
         assertEquals(5.0, dto.getDuplicaciones());
     }
 }

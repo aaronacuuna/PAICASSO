@@ -45,7 +45,7 @@ public class SonarService {
             headers.setBasicAuth(sonarToken, "");
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
-            String metricKeys = "bugs,vulnerabilities,code_smells,ncloc,coverage,duplicated_lines_density";
+            String metricKeys = "bugs,vulnerabilities,code_smells,ncloc,duplicated_lines_density";
             String endpoint = sonarUrl + "/api/measures/component?component=" + projectKey + "&metricKeys=" + metricKeys;
 
             ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.GET, entity, String.class);
@@ -72,9 +72,6 @@ public class SonarService {
                         break;
                     case "ncloc":
                         dto.setLineasCodigo((int) value);
-                        break;
-                    case "coverage":
-                        dto.setCobertura(value);
                         break;
                     case "duplicated_lines_density":
                         dto.setDuplicaciones(value);
@@ -219,7 +216,10 @@ public class SonarService {
         return """
             Proyecto: %s
             Bugs: %d | Vulnerabilidades: %d | Code Smells: %d
-            Cobertura: %.1f%% | Duplicaciones: %.1f%%
+            Duplicaciones: %.1f%%
+
+            (Nota: la métrica de cobertura no está disponible en este análisis. \
+            No la tengas en cuenta para el informe ni la menciones en tu respuesta.)
 
             ### Incidencias detectadas
             %s
@@ -231,7 +231,6 @@ public class SonarService {
                 metricas.getBugs(),
                 metricas.getVulnerabilidades(),
                 metricas.getCodeSmells(),
-                metricas.getCobertura(),
                 metricas.getDuplicaciones(),
                 bloqueIncidencias,
                 bloqueCodigo

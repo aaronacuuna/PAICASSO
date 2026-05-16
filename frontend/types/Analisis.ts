@@ -6,6 +6,6 @@ export interface ApiAnalisis {
   vulnerabilidades: number;
   codeSmells: number;
   lineasCodigo: number;
-  cobertura: number;
+  cobertura: number | null;
   duplicaciones: number;
 }

@@ -205,7 +205,7 @@ public class AnalisisService {
                 analisis.setTotalVulnerabilidades(analisisDTO.getVulnerabilidades());
                 analisis.setTotalCodeSmells(analisisDTO.getCodeSmells());
                 analisis.setLineasCodigo(analisisDTO.getLineasCodigo());
-                analisis.setCobertura(analisisDTO.getCobertura());
+                analisis.setCobertura(null);
                 analisis.setDuplicaciones(analisisDTO.getDuplicaciones());
             }
 

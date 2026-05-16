@@ -62,7 +62,7 @@ class AnalisisControllerTest {
                 .vulnerabilidades(1)
                 .codeSmells(5)
                 .lineasCodigo(1000)
-                .cobertura(80.0)
+                .cobertura(null)
                 .duplicaciones(5.0)
                 .build();
         when(analisisService.obtenerUltimoAnalisis(1L)).thenReturn(dto);

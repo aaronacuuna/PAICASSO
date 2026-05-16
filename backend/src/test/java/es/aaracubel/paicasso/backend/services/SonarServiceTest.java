@@ -56,7 +56,6 @@ public class SonarServiceTest {
                             {"metric": "bugs", "value": "5"},
                             {"metric": "vulnerabilities", "value": "2"},
                             {"metric": "code_smells", "value": "15"},
-                            {"metric": "coverage", "value": "80.5"},
                             {"metric": "ncloc", "value": "100"},
                             {"metric": "duplicated_lines_density", "value": "5.5"}
                         ]
@@ -76,7 +75,7 @@ public class SonarServiceTest {
             assertEquals(5, resultado.getBugs());
             assertEquals(2, resultado.getVulnerabilidades());
             assertEquals(15, resultado.getCodeSmells());
-            assertEquals(80.5, resultado.getCobertura());
+            assertNull(resultado.getCobertura());
             assertEquals(100, resultado.getLineasCodigo());
             assertEquals(5.5, resultado.getDuplicaciones());
         }

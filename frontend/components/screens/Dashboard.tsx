@@ -68,7 +68,7 @@ export default function Dashboard({ repo }: { repo: Repository }) {
               },
               {
                 name: "Cobertura",
-                value: data.cobertura || 0,
+                value: data.cobertura ?? null,
                 percentage: true,
                 repositoryId: repo.id,
               },

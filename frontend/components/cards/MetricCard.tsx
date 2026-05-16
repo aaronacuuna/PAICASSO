@@ -9,7 +9,9 @@ export default function MetricCard({ metric }: MetricCardProps) {
   return (
     <div className="metric-container">
       <h2>{metric.name}</h2>
-      {metric.name === "Líneas" ? (
+      {metric.value === null ? (
+        <p>N/D</p>
+      ) : metric.name === "Líneas" ? (
         <p>
           {metric.value >= 1000
             ? `${(metric.value / 1000).toFixed(1)}k`
